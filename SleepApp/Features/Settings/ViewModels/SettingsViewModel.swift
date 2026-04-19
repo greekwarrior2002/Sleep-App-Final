@@ -7,7 +7,6 @@ final class SettingsViewModel: ObservableObject {
     @Published var claudeAPIKey: String = ""
     @Published var isAPIKeyVisible = false
     @Published var showResetConfirmation = false
-    @Published var isSaving = false
     @Published var successMessage: String?
 
     @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = 8.0
@@ -24,11 +23,15 @@ final class SettingsViewModel: ObservableObject {
     @AppStorage(Constants.UserDefaults.hasCompletedOnboarding) var hasCompletedOnboarding: Bool = true
 
     private let notifications = NotificationService.shared
-    private let context: ModelContext
+    private var context: ModelContext?
 
-    init(context: ModelContext) {
-        self.context = context
+    init() {
         self.claudeAPIKey = KeychainService.shared.claudeAPIKey ?? ""
+    }
+
+    func setup(context: ModelContext) {
+        guard self.context == nil else { return }
+        self.context = context
     }
 
     func saveAPIKey() {
@@ -48,7 +51,6 @@ final class SettingsViewModel: ObservableObject {
             } else {
                 notifications.cancelAll()
             }
-
             if morningCheckinEnabled {
                 notifications.scheduleMorningCheckin(hour: morningCheckinHour, minute: morningCheckinMinute)
             }
@@ -56,36 +58,30 @@ final class SettingsViewModel: ObservableObject {
     }
 
     func resetAllData() async {
+        guard let context else { return }
         do {
             let sleepRepo = SleepRepository(context: context)
             let logRepo = DailyLogRepository(context: context)
             let insightRepo = InsightRepository(context: context)
             let scoreRepo = SleepScoreRepository(context: context)
-
             try sleepRepo.deleteAll()
             try logRepo.deleteAll()
             try insightRepo.deleteAll()
             try scoreRepo.deleteAll()
-
             KeychainService.shared.claudeAPIKey = nil
             claudeAPIKey = ""
             hasCompletedOnboarding = false
-        } catch {
-            // Handle silently
-        }
+        } catch { }
     }
 
     private func showSuccess(_ message: String) {
         successMessage = message
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.successMessage = nil
-        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { self.successMessage = nil }
     }
 
     var maskedAPIKey: String {
         guard !claudeAPIKey.isEmpty else { return "" }
-        let prefix = String(claudeAPIKey.prefix(8))
-        return prefix + String(repeating: "•", count: 20)
+        return String(claudeAPIKey.prefix(8)) + String(repeating: "•", count: 20)
     }
 
     var appVersion: String {

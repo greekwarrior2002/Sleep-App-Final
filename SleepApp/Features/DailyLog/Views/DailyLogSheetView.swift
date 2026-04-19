@@ -4,12 +4,8 @@ import SwiftData
 struct DailyLogSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
-    @StateObject private var viewModel: DailyLogViewModel
+    @StateObject private var viewModel = DailyLogViewModel()
     @State private var showSaveSuccess = false
-
-    init() {
-        self._viewModel = StateObject(wrappedValue: DailyLogViewModel(context: ModelContext(try! ModelContainer(for: SleepSession.self, DailyLog.self, SleepInsight.self, SleepScore.self))))
-    }
 
     var body: some View {
         NavigationStack {
@@ -31,7 +27,6 @@ struct DailyLogSheetView: View {
                     }
                     .padding(Spacing.md)
                 }
-
                 VStack {
                     Spacer()
                     saveButton
@@ -55,7 +50,10 @@ struct DailyLogSheetView: View {
                 }
             }
         }
-        .task { await viewModel.loadExisting() }
+        .task {
+            viewModel.setup(context: context)
+            await viewModel.loadExisting()
+        }
         .onChange(of: viewModel.saveSuccess) { _, success in
             if success {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
@@ -85,10 +83,11 @@ struct DailyLogSheetView: View {
     }
 
     private var caffeineSection: some View {
-        LogSection(title: "Caffeine", icon: "cup.and.saucer.fill", iconColor: .scoreFair, badge: viewModel.totalCaffeineMg > 0 ? "\(viewModel.totalCaffeineMg) mg" : nil) {
+        LogSection(title: "Caffeine", icon: "cup.and.saucer.fill", iconColor: .scoreFair,
+                   badge: viewModel.totalCaffeineMg > 0 ? "\(viewModel.totalCaffeineMg) mg" : nil) {
             VStack(spacing: Spacing.sm) {
                 if !viewModel.caffeineEntries.isEmpty {
-                    ForEach(Array(viewModel.caffeineEntries.enumerated()), id: \.element.id) { index, entry in
+                    ForEach(Array(viewModel.caffeineEntries.enumerated()), id: \.element.id) { index, _ in
                         CaffeineEntryRowView(
                             entry: Binding(
                                 get: { viewModel.caffeineEntries[index] },
@@ -98,10 +97,12 @@ struct DailyLogSheetView: View {
                         )
                     }
                 }
-
                 SingleSelectChipGroup(
                     options: CaffeineEntry.commonSources,
-                    selected: Binding(get: { nil }, set: { if let s = $0 { viewModel.addCaffeineEntry(source: s) } }),
+                    selected: Binding(
+                        get: { nil },
+                        set: { if let s = $0 { viewModel.addCaffeineEntry(source: s) } }
+                    ),
                     color: .scoreFair
                 )
             }
@@ -109,10 +110,11 @@ struct DailyLogSheetView: View {
     }
 
     private var exerciseSection: some View {
-        LogSection(title: "Exercise", icon: "figure.run", iconColor: .sleepTeal, badge: viewModel.totalExerciseMinutes > 0 ? "\(viewModel.totalExerciseMinutes) min" : nil) {
+        LogSection(title: "Exercise", icon: "figure.run", iconColor: .sleepTeal,
+                   badge: viewModel.totalExerciseMinutes > 0 ? "\(viewModel.totalExerciseMinutes) min" : nil) {
             VStack(spacing: Spacing.sm) {
                 if !viewModel.exerciseEntries.isEmpty {
-                    ForEach(Array(viewModel.exerciseEntries.enumerated()), id: \.element.id) { index, entry in
+                    ForEach(Array(viewModel.exerciseEntries.enumerated()), id: \.element.id) { index, _ in
                         ExerciseEntryRowView(
                             entry: Binding(
                                 get: { viewModel.exerciseEntries[index] },
@@ -122,10 +124,12 @@ struct DailyLogSheetView: View {
                         )
                     }
                 }
-
                 SingleSelectChipGroup(
                     options: ExerciseEntry.commonTypes,
-                    selected: Binding(get: { nil }, set: { if let s = $0 { viewModel.addExerciseEntry(type: s) } }),
+                    selected: Binding(
+                        get: { nil },
+                        set: { if let s = $0 { viewModel.addExerciseEntry(type: s) } }
+                    ),
                     color: .sleepTeal
                 )
             }
@@ -133,23 +137,21 @@ struct DailyLogSheetView: View {
     }
 
     private var stressSection: some View {
-        LogSection(title: "Stress Level", icon: "brain.head.profile", iconColor: .sleepPurpleLight, badge: viewModel.stressLevel > 0 ? "\(viewModel.stressLevel)/5" : nil) {
+        LogSection(title: "Stress Level", icon: "brain.head.profile", iconColor: .sleepPurpleLight,
+                   badge: viewModel.stressLevel > 0 ? "\(viewModel.stressLevel)/5" : nil) {
             StressSlider(value: $viewModel.stressLevel)
         }
     }
 
     private var alcoholSection: some View {
-        LogSection(title: "Alcohol", icon: "wineglass.fill", iconColor: .scorePoor, badge: viewModel.alcoholUnits > 0 ? String(format: "%.1f units", viewModel.alcoholUnits) : nil) {
+        LogSection(title: "Alcohol", icon: "wineglass.fill", iconColor: .scorePoor,
+                   badge: viewModel.alcoholUnits > 0 ? String(format: "%.1f units", viewModel.alcoholUnits) : nil) {
             HStack {
                 Text("Standard drinks")
                     .font(.bodyMedium)
                     .foregroundStyle(.textSecondary)
                 Spacer()
-                Stepper(
-                    value: $viewModel.alcoholUnits,
-                    in: 0...15,
-                    step: 0.5
-                ) {
+                Stepper(value: $viewModel.alcoholUnits, in: 0...15, step: 0.5) {
                     Text(viewModel.alcoholUnits > 0 ? String(format: "%.1f", viewModel.alcoholUnits) : "None")
                         .font(.titleSmall)
                         .fontWeight(.semibold)
@@ -162,21 +164,21 @@ struct DailyLogSheetView: View {
     }
 
     private var screenTimeSection: some View {
-        LogSection(title: "Screen Time Before Bed", icon: "iphone", iconColor: .warning, badge: viewModel.screenTimeMinutes > 0 ? "\(viewModel.screenTimeMinutes) min" : nil) {
+        LogSection(title: "Screen Time Before Bed", icon: "iphone", iconColor: .warning,
+                   badge: viewModel.screenTimeMinutes > 0 ? "\(viewModel.screenTimeMinutes) min" : nil) {
             SleepSlider(
                 value: Binding(
                     get: { Double(viewModel.screenTimeMinutes) },
                     set: { viewModel.screenTimeMinutes = Int($0) }
                 ),
-                range: 0...180,
-                step: 5,
-                trackColor: .warning
+                range: 0...180, step: 5, trackColor: .warning
             )
         }
     }
 
     private var supplementsSection: some View {
-        LogSection(title: "Supplements", icon: "pill.fill", iconColor: .positive, badge: viewModel.selectedSupplements.isEmpty ? nil : "\(viewModel.selectedSupplements.count)") {
+        LogSection(title: "Supplements", icon: "pill.fill", iconColor: .positive,
+                   badge: viewModel.selectedSupplements.isEmpty ? nil : "\(viewModel.selectedSupplements.count)") {
             SelectableChipGroup(
                 options: DailyLogViewModel.commonSupplements,
                 selected: $viewModel.selectedSupplements,
@@ -192,12 +194,9 @@ struct DailyLogSheetView: View {
                     .font(.bodyMedium)
                     .foregroundStyle(.textSecondary)
                     .tint(.sleepTeal)
-
                 if viewModel.hasNap {
                     HStack {
-                        Text("Duration")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textSecondary)
+                        Text("Duration").font(.bodyMedium).foregroundStyle(.textSecondary)
                         Spacer()
                         Picker("Duration", selection: $viewModel.napDurationMinutes) {
                             ForEach([10, 15, 20, 30, 45, 60, 90], id: \.self) { min in
@@ -229,9 +228,7 @@ struct DailyLogSheetView: View {
 
     private func moodRow(label: String, value: Binding<Int>) -> some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(label)
-                .font(.bodyMedium)
-                .foregroundStyle(.textSecondary)
+            Text(label).font(.bodyMedium).foregroundStyle(.textSecondary)
             HStack(spacing: 0) {
                 ForEach(1...5, id: \.self) { v in
                     Button {
@@ -257,7 +254,6 @@ struct DailyLogSheetView: View {
                 .foregroundStyle(.textSecondary)
                 .frame(minHeight: 80, maxHeight: 120)
                 .scrollContentBackground(.hidden)
-                .background(Color.clear)
                 .overlay(alignment: .topLeading) {
                     if viewModel.notes.isEmpty {
                         Text("Anything else that might affect your sleep tonight?")
@@ -308,9 +304,7 @@ private struct LogSection<Content: View>: View {
                             .foregroundStyle(iconColor)
                             .padding(.horizontal, Spacing.xs)
                             .padding(.vertical, 3)
-                            .background {
-                                Capsule().fill(iconColor.opacity(0.15))
-                            }
+                            .background { Capsule().fill(iconColor.opacity(0.15)) }
                     }
                 }
                 content()
@@ -343,8 +337,7 @@ private struct CaffeineEntryRowView: View {
             }
             .tint(.scoreFair)
             Button(action: onDelete) {
-                Image(systemName: "minus.circle.fill")
-                    .foregroundStyle(.textTertiary)
+                Image(systemName: "minus.circle.fill").foregroundStyle(.textTertiary)
             }
             .buttonStyle(.plain)
         }
@@ -359,9 +352,7 @@ private struct ExerciseEntryRowView: View {
     var body: some View {
         VStack(spacing: Spacing.xs) {
             HStack {
-                Text(entry.type)
-                    .font(.bodyMedium)
-                    .foregroundStyle(.textSecondary)
+                Text(entry.type).font(.bodyMedium).foregroundStyle(.textSecondary)
                 Spacer()
                 Stepper(value: $entry.durationMinutes, in: 5...300, step: 5) {
                     Text("\(entry.durationMinutes) min")
@@ -373,8 +364,7 @@ private struct ExerciseEntryRowView: View {
                 }
                 .tint(.sleepTeal)
                 Button(action: onDelete) {
-                    Image(systemName: "minus.circle.fill")
-                        .foregroundStyle(.textTertiary)
+                    Image(systemName: "minus.circle.fill").foregroundStyle(.textTertiary)
                 }
                 .buttonStyle(.plain)
             }
@@ -389,8 +379,7 @@ private struct ExerciseEntryRowView: View {
                             .padding(.horizontal, Spacing.xs)
                             .padding(.vertical, 4)
                             .background {
-                                Capsule()
-                                    .fill(entry.timeOfDay == time ? Color.sleepTeal : Color.sleepElevated)
+                                Capsule().fill(entry.timeOfDay == time ? Color.sleepTeal : Color.sleepElevated)
                             }
                     }
                     .buttonStyle(.plain)

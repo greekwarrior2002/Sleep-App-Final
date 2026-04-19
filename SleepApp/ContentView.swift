@@ -2,20 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab: AppTab = .dashboard
-    @State private var showDailyLogSheet = false
+    @State private var showLogSheet = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
-                DashboardView(showLogSheet: $showDailyLogSheet)
+                DashboardView(showLogSheet: $showLogSheet)
                     .tag(AppTab.dashboard)
-
                 SleepHistoryView()
                     .tag(AppTab.history)
-
                 InsightsView()
                     .tag(AppTab.insights)
-
                 SettingsView()
                     .tag(AppTab.settings)
             }
@@ -24,13 +21,11 @@ struct ContentView: View {
 
             SleepTabBar(selectedTab: $selectedTab, showLogSheet: $showLogSheet)
         }
-        .sheet(isPresented: $showDailyLogSheet) {
+        .sheet(isPresented: $showLogSheet) {
             DailyLogSheetView()
         }
         .background(Color.sleepBackground.ignoresSafeArea())
     }
-
-    @State private var showLogSheet = false
 }
 
 enum AppTab: Int, CaseIterable {
@@ -79,8 +74,7 @@ struct SleepTabBar: View {
             Rectangle()
                 .fill(.ultraThinMaterial)
                 .overlay(alignment: .top) {
-                    Divider()
-                        .overlay(Color.sleepBorder)
+                    Divider().overlay(Color.sleepBorder)
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
@@ -104,9 +98,7 @@ struct SleepTabBar: View {
     }
 
     private var logButton: some View {
-        Button {
-            showLogSheet = true
-        } label: {
+        Button { showLogSheet = true } label: {
             ZStack {
                 Circle()
                     .fill(
@@ -118,7 +110,6 @@ struct SleepTabBar: View {
                     )
                     .frame(width: 52, height: 52)
                     .shadow(color: Color.sleepPurple.opacity(0.4), radius: 12, y: 4)
-
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(.white)

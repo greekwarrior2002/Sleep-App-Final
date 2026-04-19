@@ -14,19 +14,21 @@ final class InsightsViewModel: ObservableObject {
 
     @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = 8.0
 
-    private let insightRepo: InsightRepository
-    private let sleepRepo: SleepRepository
-    private let logRepo: DailyLogRepository
+    private var insightRepo: InsightRepository?
+    private var sleepRepo: SleepRepository?
+    private var logRepo: DailyLogRepository?
     private let aiService = ClaudeAIService.shared
     private let correlationEngine = CorrelationEngine()
 
-    init(context: ModelContext) {
-        self.insightRepo = InsightRepository(context: context)
-        self.sleepRepo = SleepRepository(context: context)
-        self.logRepo = DailyLogRepository(context: context)
+    func setup(context: ModelContext) {
+        guard insightRepo == nil else { return }
+        insightRepo = InsightRepository(context: context)
+        sleepRepo = SleepRepository(context: context)
+        logRepo = DailyLogRepository(context: context)
     }
 
     func load() async {
+        guard let insightRepo, let sleepRepo, let logRepo else { return }
         isLoading = true
         defer { isLoading = false }
         hasAPIKey = KeychainService.shared.hasAPIKey
@@ -47,6 +49,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     func generateInsight() async {
+        guard let sleepRepo, let logRepo else { return }
         do {
             let sessions = try sleepRepo.fetchRecent(days: 30)
             let logs = try logRepo.fetchRecent(days: 30)
@@ -57,6 +60,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     private func generateInsight(sessions: [SleepSession], logs: [DailyLog]) async {
+        guard let insightRepo else { return }
         guard hasAPIKey else {
             error = "Add your Claude API key in Settings to generate insights."
             return
@@ -82,9 +86,5 @@ final class InsightsViewModel: ObservableObject {
         } catch {
             self.error = error.localizedDescription
         }
-    }
-
-    var hasEnoughData: Bool {
-        (try? sleepRepo.fetchRecent(days: 30))?.count ?? 0 >= Constants.AI.minimumNightsForInsight
     }
 }

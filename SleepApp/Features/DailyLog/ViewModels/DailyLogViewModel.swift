@@ -22,17 +22,17 @@ final class DailyLogViewModel: ObservableObject {
     @Published var saveSuccess = false
     @Published var error: String?
 
-    private let logRepo: DailyLogRepository
-    private var existingLog: DailyLog?
+    private var logRepo: DailyLogRepository?
 
-    init(context: ModelContext) {
-        self.logRepo = DailyLogRepository(context: context)
+    func setup(context: ModelContext) {
+        guard logRepo == nil else { return }
+        logRepo = DailyLogRepository(context: context)
     }
 
     func loadExisting(for date: Date = Date()) async {
         self.date = date
+        guard let logRepo else { return }
         if let log = try? logRepo.fetchForDate(date) {
-            existingLog = log
             caffeineEntries = log.caffeineEntries
             exerciseEntries = log.exerciseEntries
             stressLevel = log.stressLevel
@@ -49,6 +49,7 @@ final class DailyLogViewModel: ObservableObject {
     }
 
     func save() async {
+        guard let logRepo else { return }
         isSaving = true
         defer { isSaving = false }
         do {
@@ -76,16 +77,8 @@ final class DailyLogViewModel: ObservableObject {
         caffeineEntries.append(CaffeineEntry(time: Date(), amountMg: amount, source: source))
     }
 
-    func removeCaffeineEntry(at offsets: IndexSet) {
-        caffeineEntries.remove(atOffsets: offsets)
-    }
-
     func addExerciseEntry(type: String) {
         exerciseEntries.append(ExerciseEntry(type: type, durationMinutes: 30, timeOfDay: .morning))
-    }
-
-    func removeExerciseEntry(at offsets: IndexSet) {
-        exerciseEntries.remove(atOffsets: offsets)
     }
 
     var totalCaffeineMg: Int { caffeineEntries.reduce(0) { $0 + $1.amountMg } }

@@ -3,12 +3,8 @@ import SwiftData
 
 struct SleepHistoryView: View {
     @Environment(\.modelContext) private var context
-    @StateObject private var viewModel: SleepHistoryViewModel
+    @StateObject private var viewModel = SleepHistoryViewModel()
     @State private var selectedSession: SleepSession?
-
-    init() {
-        self._viewModel = StateObject(wrappedValue: SleepHistoryViewModel(context: ModelContext(try! ModelContainer(for: SleepSession.self, DailyLog.self, SleepInsight.self, SleepScore.self))))
-    }
 
     var body: some View {
         NavigationStack {
@@ -19,7 +15,10 @@ struct SleepHistoryView: View {
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .task { await viewModel.load() }
+        .task {
+            viewModel.setup(context: context)
+            await viewModel.load()
+        }
         .sheet(item: $selectedSession) { session in
             SleepNightDetailView(session: session)
         }
@@ -40,18 +39,14 @@ struct SleepHistoryView: View {
                             period: viewModel.selectedPeriod,
                             selectedSession: $selectedSession
                         )
-
                         if viewModel.displaySessions.count >= 3 {
                             StageAreaChartView(sessions: viewModel.displaySessions)
                         }
-
                         StatsCardView(viewModel: viewModel)
-
                         nightsList
                     }
                     .padding(.horizontal, Spacing.md)
                 }
-
                 Spacer(minLength: 100)
             }
             .padding(.top, Spacing.sm)
@@ -97,7 +92,6 @@ struct SleepHistoryView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 SectionHeaderView(title: "All Nights")
-
                 LazyVStack(spacing: 0) {
                     ForEach(Array(viewModel.displaySessions.reversed().enumerated()), id: \.element.id) { index, session in
                         SleepNightRowView(session: session) {
@@ -140,7 +134,7 @@ struct SleepNightRowView: View {
             HStack(spacing: Spacing.sm) {
                 ZStack {
                     Circle()
-                        .fill(scoreBackground)
+                        .fill(scoreColor.opacity(0.15))
                         .frame(width: 36, height: 36)
                     Text("\(session.score?.overallScore ?? 0)")
                         .font(.labelLarge)
@@ -148,7 +142,6 @@ struct SleepNightRowView: View {
                         .foregroundStyle(scoreColor)
                         .monoDigits()
                 }
-
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.endDate.relativeDescription)
                         .font(.titleSmall)
@@ -157,9 +150,7 @@ struct SleepNightRowView: View {
                         .font(.caption)
                         .foregroundStyle(.textTertiary)
                 }
-
                 Spacer()
-
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(session.formattedDuration)
                         .font(.titleSmall)
@@ -171,7 +162,6 @@ struct SleepNightRowView: View {
                         .foregroundStyle(.textTertiary)
                         .lineLimit(1)
                 }
-
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.textTertiary)
@@ -181,11 +171,5 @@ struct SleepNightRowView: View {
         .buttonStyle(.plain)
     }
 
-    private var scoreColor: Color {
-        .scoreColor(for: session.score?.overallScore ?? 0)
-    }
-
-    private var scoreBackground: Color {
-        scoreColor.opacity(0.15)
-    }
+    private var scoreColor: Color { .scoreColor(for: session.score?.overallScore ?? 0) }
 }

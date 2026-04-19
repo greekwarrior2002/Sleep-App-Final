@@ -22,13 +22,15 @@ final class SleepHistoryViewModel: ObservableObject {
 
     @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
 
-    private let sleepRepo: SleepRepository
+    private var sleepRepo: SleepRepository?
 
-    init(context: ModelContext) {
-        self.sleepRepo = SleepRepository(context: context)
+    func setup(context: ModelContext) {
+        guard sleepRepo == nil else { return }
+        sleepRepo = SleepRepository(context: context)
     }
 
     func load() async {
+        guard let sleepRepo else { return }
         isLoading = true
         defer { isLoading = false }
         do {

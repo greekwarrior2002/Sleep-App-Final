@@ -19,7 +19,7 @@ struct SleepApp: App {
         }
     }
 
-    var sharedModelContainer: ModelContainer = {
+    let sharedModelContainer: ModelContainer = {
         let schema = Schema([
             SleepSession.self,
             DailyLog.self,

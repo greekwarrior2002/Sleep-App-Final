@@ -3,11 +3,7 @@ import SwiftData
 
 struct InsightsView: View {
     @Environment(\.modelContext) private var context
-    @StateObject private var viewModel: InsightsViewModel
-
-    init() {
-        self._viewModel = StateObject(wrappedValue: InsightsViewModel(context: ModelContext(try! ModelContainer(for: SleepSession.self, DailyLog.self, SleepInsight.self, SleepScore.self))))
-    }
+    @StateObject private var viewModel = InsightsViewModel()
 
     var body: some View {
         NavigationStack {
@@ -19,7 +15,10 @@ struct InsightsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
         }
-        .task { await viewModel.load() }
+        .task {
+            viewModel.setup(context: context)
+            await viewModel.load()
+        }
     }
 
     @ViewBuilder
@@ -29,22 +28,14 @@ struct InsightsView: View {
         } else {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: Spacing.lg) {
-                    if !viewModel.hasAPIKey {
-                        apiKeyBanner
-                    }
-                    if let error = viewModel.error {
-                        errorBanner(error)
-                    }
+                    if !viewModel.hasAPIKey { apiKeyBanner }
+                    if let error = viewModel.error { errorBanner(error) }
                     reportCard
-                    if !viewModel.correlations.isEmpty || !(viewModel.currentInsight?.correlations ?? []).isEmpty {
-                        correlationSection
-                    }
+                    if !combinedCorrelations.isEmpty { correlationSection }
                     if let insight = viewModel.currentInsight, !insight.recommendations.isEmpty {
                         recommendationsSection(insight.recommendations)
                     }
-                    if viewModel.pastInsights.count > 1 {
-                        historySection
-                    }
+                    if viewModel.pastInsights.count > 1 { historySection }
                     Spacer(minLength: 100)
                 }
                 .padding(Spacing.md)
@@ -58,9 +49,7 @@ struct InsightsView: View {
                 HStack {
                     HStack(spacing: Spacing.xs) {
                         ZStack {
-                            Circle()
-                                .fill(Color.sleepPurpleDim)
-                                .frame(width: 32, height: 32)
+                            Circle().fill(Color.sleepPurpleDim).frame(width: 32, height: 32)
                             Image(systemName: "sparkles")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(.sleepPurpleLight)
@@ -91,7 +80,6 @@ struct InsightsView: View {
                         .font(.bodyLarge)
                         .foregroundStyle(.textSecondary)
                         .lineSpacing(4)
-
                     if let trend = viewModel.currentInsight?.trend {
                         trendBadge(trend)
                     }
@@ -107,11 +95,9 @@ struct InsightsView: View {
             LoadingRingView().frame(width: 24, height: 24)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Analyzing your sleep patterns…")
-                    .font(.bodyMedium)
-                    .foregroundStyle(.textSecondary)
+                    .font(.bodyMedium).foregroundStyle(.textSecondary)
                 Text("This usually takes 5–15 seconds")
-                    .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .font(.caption).foregroundStyle(.textTertiary)
             }
         }
         .padding(.vertical, Spacing.sm)
@@ -120,14 +106,11 @@ struct InsightsView: View {
     private var emptyReportState: some View {
         VStack(spacing: Spacing.sm) {
             Image(systemName: "wand.and.stars")
-                .font(.system(size: 32))
-                .foregroundStyle(.textTertiary)
+                .font(.system(size: 32)).foregroundStyle(.textTertiary)
             Text("No insights yet")
-                .font(.titleSmall)
-                .foregroundStyle(.textSecondary)
+                .font(.titleSmall).foregroundStyle(.textSecondary)
             Text("Sync sleep data and add lifestyle logs to generate personalized AI insights.")
-                .font(.bodyMedium)
-                .foregroundStyle(.textTertiary)
+                .font(.bodyMedium).foregroundStyle(.textTertiary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -136,29 +119,19 @@ struct InsightsView: View {
 
     private func confidenceBadge(_ percent: Int) -> some View {
         Text("\(percent)% confidence")
-            .font(.caption)
-            .foregroundStyle(.textTertiary)
-            .padding(.horizontal, Spacing.xs)
-            .padding(.vertical, 3)
-            .background {
-                Capsule().fill(Color.sleepElevated)
-            }
+            .font(.caption).foregroundStyle(.textTertiary)
+            .padding(.horizontal, Spacing.xs).padding(.vertical, 3)
+            .background { Capsule().fill(Color.sleepElevated) }
     }
 
     private func trendBadge(_ trend: ScoreTrend) -> some View {
         HStack(spacing: 4) {
-            Image(systemName: trend.icon)
-                .font(.system(size: 11, weight: .semibold))
-            Text(trend.rawValue.capitalized)
-                .font(.labelSmall)
-                .fontWeight(.semibold)
+            Image(systemName: trend.icon).font(.system(size: 11, weight: .semibold))
+            Text(trend.rawValue.capitalized).font(.labelSmall).fontWeight(.semibold)
         }
         .foregroundStyle(trendColor(trend))
-        .padding(.horizontal, Spacing.sm)
-        .padding(.vertical, 4)
-        .background {
-            Capsule().fill(trendColor(trend).opacity(0.15))
-        }
+        .padding(.horizontal, Spacing.sm).padding(.vertical, 4)
+        .background { Capsule().fill(trendColor(trend).opacity(0.15)) }
     }
 
     private func trendColor(_ trend: ScoreTrend) -> Color {
@@ -171,40 +144,22 @@ struct InsightsView: View {
 
     private var correlationSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionHeaderView(title: "Detected Patterns")
+            SectionHeaderView(title: "Detected Patterns").padding(.horizontal, Spacing.xxs)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Spacing.sm) {
+                    ForEach(combinedCorrelations) { correlation in
+                        CorrelationCardView(correlation: correlation).frame(width: 200)
+                    }
+                }
                 .padding(.horizontal, Spacing.xxs)
-
-            let allCorrelations = combinedCorrelations
-            if allCorrelations.isEmpty {
-                GlassCard {
-                    HStack {
-                        Image(systemName: "chart.line.flattrend.xyaxis")
-                            .foregroundStyle(.textTertiary)
-                        Text("Not enough data yet to detect patterns. Log a few more nights.")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textTertiary)
-                    }
-                }
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Spacing.sm) {
-                        ForEach(allCorrelations) { correlation in
-                            CorrelationCardView(correlation: correlation)
-                                .frame(width: 200)
-                        }
-                    }
-                    .padding(.horizontal, Spacing.xxs)
-                }
             }
         }
     }
 
     private var combinedCorrelations: [CorrelationFinding] {
         let aiCorrelations = viewModel.currentInsight?.correlations ?? []
-        let localCorrelations = viewModel.correlations
-
         var combined = aiCorrelations
-        for local in localCorrelations {
+        for local in viewModel.correlations {
             if !combined.contains(where: { $0.factor == local.factor }) {
                 combined.append(local)
             }
@@ -214,22 +169,16 @@ struct InsightsView: View {
 
     private func recommendationsSection(_ recs: [Recommendation]) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionHeaderView(title: "Recommendations")
-                .padding(.horizontal, Spacing.xxs)
-
+            SectionHeaderView(title: "Recommendations").padding(.horizontal, Spacing.xxs)
             VStack(spacing: Spacing.xs) {
-                ForEach(recs.prefix(7)) { rec in
-                    RecommendationRowView(recommendation: rec)
-                }
+                ForEach(recs.prefix(7)) { rec in RecommendationRowView(recommendation: rec) }
             }
         }
     }
 
     private var historySection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            SectionHeaderView(title: "Past Reports")
-                .padding(.horizontal, Spacing.xxs)
-
+            SectionHeaderView(title: "Past Reports").padding(.horizontal, Spacing.xxs)
             VStack(spacing: Spacing.xs) {
                 ForEach(viewModel.pastInsights.dropFirst()) { insight in
                     InsightHistoryRow(insight: insight)
@@ -240,15 +189,12 @@ struct InsightsView: View {
 
     private var apiKeyBanner: some View {
         HStack(spacing: Spacing.sm) {
-            Image(systemName: "key.fill")
-                .foregroundStyle(.sleepPurpleLight)
+            Image(systemName: "key.fill").foregroundStyle(.sleepPurpleLight)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Add API Key for AI Insights")
-                    .font(.titleSmall)
-                    .foregroundStyle(.textPrimary)
+                    .font(.titleSmall).foregroundStyle(.textPrimary)
                 Text("Add your Claude API key in Settings to enable AI analysis.")
-                    .font(.caption)
-                    .foregroundStyle(.textSecondary)
+                    .font(.caption).foregroundStyle(.textSecondary)
             }
         }
         .glassCard()
@@ -260,11 +206,8 @@ struct InsightsView: View {
 
     private func errorBanner(_ message: String) -> some View {
         HStack(spacing: Spacing.sm) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.warning)
-            Text(message)
-                .font(.bodyMedium)
-                .foregroundStyle(.textSecondary)
+            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.warning)
+            Text(message).font(.bodyMedium).foregroundStyle(.textSecondary)
         }
         .glassCard()
     }
@@ -307,25 +250,18 @@ struct CorrelationCardView: View {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 HStack {
                     Text(correlation.factor)
-                        .font(.titleSmall)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.textPrimary)
+                        .font(.titleSmall).fontWeight(.semibold).foregroundStyle(.textPrimary)
                         .lineLimit(2)
                     Spacer(minLength: 0)
                     directionIcon
                 }
-
                 Text(correlation.effect)
-                    .font(.bodyMedium)
-                    .foregroundStyle(.textSecondary)
-                    .lineLimit(3)
-
+                    .font(.bodyMedium).foregroundStyle(.textSecondary).lineLimit(3)
                 HStack {
                     strengthBar
                     Spacer()
                     Text("\(correlation.occurrences) nights")
-                        .font(.caption)
-                        .foregroundStyle(.textTertiary)
+                        .font(.caption).foregroundStyle(.textTertiary)
                 }
             }
         }
@@ -336,9 +272,7 @@ struct CorrelationCardView: View {
             .font(.system(size: 14, weight: .bold))
             .foregroundStyle(directionColor)
             .padding(6)
-            .background {
-                Circle().fill(directionColor.opacity(0.15))
-            }
+            .background { Circle().fill(directionColor.opacity(0.15)) }
     }
 
     private var directionSymbol: String {
@@ -367,9 +301,7 @@ struct CorrelationCardView: View {
         }
     }
 
-    private var strengthDots: Int {
-        Int(abs(correlation.strength) * 5).clamped(to: 1...5)
-    }
+    private var strengthDots: Int { Int(abs(correlation.strength) * 5).clamped(to: 1...5) }
 }
 
 struct RecommendationRowView: View {
@@ -383,13 +315,10 @@ struct RecommendationRowView: View {
                     categoryIcon
                     VStack(alignment: .leading, spacing: 2) {
                         Text(recommendation.title)
-                            .font(.titleSmall)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.textPrimary)
+                            .font(.titleSmall).fontWeight(.semibold).foregroundStyle(.textPrimary)
                         if isExpanded {
                             Text(recommendation.detail)
-                                .font(.bodyMedium)
-                                .foregroundStyle(.textSecondary)
+                                .font(.bodyMedium).foregroundStyle(.textSecondary)
                                 .lineSpacing(3)
                                 .transition(.opacity.combined(with: .move(edge: .top)))
                         }
@@ -412,9 +341,7 @@ struct RecommendationRowView: View {
 
     private var categoryIcon: some View {
         ZStack {
-            Circle()
-                .fill(categoryColor.opacity(0.15))
-                .frame(width: 32, height: 32)
+            Circle().fill(categoryColor.opacity(0.15)).frame(width: 32, height: 32)
             Image(systemName: recommendation.category.icon)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(categoryColor)
@@ -444,19 +371,15 @@ struct InsightHistoryRow: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(insight.periodDescription)
-                        .font(.titleSmall)
-                        .foregroundStyle(.textPrimary)
+                        .font(.titleSmall).foregroundStyle(.textPrimary)
                     Text(insight.summary)
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textSecondary)
-                        .lineLimit(2)
+                        .font(.bodyMedium).foregroundStyle(.textSecondary).lineLimit(2)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     trendBadge(insight.trend)
                     Text("\(insight.dataPointsAnalyzed) nights")
-                        .font(.caption)
-                        .foregroundStyle(.textTertiary)
+                        .font(.caption).foregroundStyle(.textTertiary)
                 }
             }
         }
@@ -464,11 +387,8 @@ struct InsightHistoryRow: View {
 
     private func trendBadge(_ trend: ScoreTrend) -> some View {
         HStack(spacing: 3) {
-            Image(systemName: trend.icon)
-                .font(.system(size: 9, weight: .bold))
-            Text(trend.rawValue.capitalized)
-                .font(.caption)
-                .fontWeight(.medium)
+            Image(systemName: trend.icon).font(.system(size: 9, weight: .bold))
+            Text(trend.rawValue.capitalized).font(.caption).fontWeight(.medium)
         }
         .foregroundStyle(trendColor(trend))
     }

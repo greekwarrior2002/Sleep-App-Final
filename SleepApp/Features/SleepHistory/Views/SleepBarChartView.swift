@@ -57,7 +57,7 @@ struct SleepBarChartView: View {
                     }
                 }
                 .chartScrollableAxes(period == .quarter ? .horizontal : [])
-                .chartXVisibleDomain(length: period == .quarter ? 3600 * 24 * 30 : 3600 * 24 * Double(period.rawValue))
+                .chartXVisibleDomain(length: 3600.0 * 24.0 * Double(period == .quarter ? 30 : period.rawValue))
                 .chartOverlay { proxy in
                     GeometryReader { _ in
                         Rectangle().fill(.clear).contentShape(Rectangle())

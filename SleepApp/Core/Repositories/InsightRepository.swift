@@ -4,21 +4,32 @@ import SwiftData
 @MainActor
 final class InsightRepository {
     private let context: ModelContext
-    @AppStorage("lastInsightGeneratedAt") private var lastInsightGeneratedAtDouble: Double = 0
-    @AppStorage("insightSessionCount") private var insightSessionCount: Int = 0
+
+    private var lastInsightGeneratedAt: Date? {
+        get {
+            let v = UserDefaults.standard.double(forKey: "lastInsightGeneratedAt")
+            return v > 0 ? Date(timeIntervalSince1970: v) : nil
+        }
+        set {
+            UserDefaults.standard.set(newValue?.timeIntervalSince1970 ?? 0, forKey: "lastInsightGeneratedAt")
+        }
+    }
+
+    private var insightSessionCount: Int {
+        get { UserDefaults.standard.integer(forKey: "insightSessionCount") }
+        set { UserDefaults.standard.set(newValue, forKey: "insightSessionCount") }
+    }
 
     init(context: ModelContext) {
         self.context = context
     }
 
-    var lastInsightGeneratedAt: Date? {
-        get { lastInsightGeneratedAtDouble > 0 ? Date(timeIntervalSince1970: lastInsightGeneratedAtDouble) : nil }
-        set { lastInsightGeneratedAtDouble = newValue?.timeIntervalSince1970 ?? 0 }
-    }
-
     func currentInsight() throws -> SleepInsight? {
         let predicate = #Predicate<SleepInsight> { $0.isCurrentInsight }
-        let descriptor = FetchDescriptor<SleepInsight>(predicate: predicate, sortBy: [SortDescriptor(\.generatedDate, order: .reverse)])
+        let descriptor = FetchDescriptor<SleepInsight>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.generatedDate, order: .reverse)]
+        )
         return try context.fetch(descriptor).first
     }
 

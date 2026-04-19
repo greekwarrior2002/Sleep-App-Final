@@ -16,21 +16,23 @@ final class DashboardViewModel: ObservableObject {
 
     @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
 
-    private let sleepRepo: SleepRepository
-    private let scoreRepo: SleepScoreRepository
-    private let insightRepo: InsightRepository
-    private let logRepo: DailyLogRepository
+    private var sleepRepo: SleepRepository?
+    private var scoreRepo: SleepScoreRepository?
+    private var insightRepo: InsightRepository?
+    private var logRepo: DailyLogRepository?
     private let healthKit = HealthKitService.shared
     private let scoreEngine = SleepScoreEngine()
 
-    init(context: ModelContext) {
-        self.sleepRepo = SleepRepository(context: context)
-        self.scoreRepo = SleepScoreRepository(context: context)
-        self.insightRepo = InsightRepository(context: context)
-        self.logRepo = DailyLogRepository(context: context)
+    func setup(context: ModelContext) {
+        guard sleepRepo == nil else { return }
+        sleepRepo = SleepRepository(context: context)
+        scoreRepo = SleepScoreRepository(context: context)
+        insightRepo = InsightRepository(context: context)
+        logRepo = DailyLogRepository(context: context)
     }
 
     func load() async {
+        guard let sleepRepo, let scoreRepo, let insightRepo, let logRepo else { return }
         isLoading = true
         defer { isLoading = false }
         do {
@@ -46,6 +48,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func syncHealthKit() async {
+        guard let sleepRepo, let scoreRepo else { return }
         isSyncing = true
         defer { isSyncing = false }
         do {
@@ -54,7 +57,6 @@ final class DashboardViewModel: ObservableObject {
 
             let start = Calendar.current.date(byAdding: .day, value: -60, to: Date()) ?? Date()
             let sessions = try await healthKit.fetchSleepSessions(from: start, to: Date())
-
             try sleepRepo.upsertFromHealthKit(sessions)
 
             let allSessions = try sleepRepo.fetchAll()
@@ -68,7 +70,6 @@ final class DashboardViewModel: ObservableObject {
                 score.session = session
                 try scoreRepo.save(score)
             }
-
             await load()
         } catch {
             self.error = error.localizedDescription
@@ -76,6 +77,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func saveCheckin(mood: Int) async {
+        guard let logRepo else { return }
         do {
             let log = try logRepo.fetchOrCreate(for: Date())
             log.moodAfterWaking = mood

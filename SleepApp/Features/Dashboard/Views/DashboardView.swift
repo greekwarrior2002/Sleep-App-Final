@@ -4,20 +4,12 @@ import SwiftData
 struct DashboardView: View {
     @Binding var showLogSheet: Bool
     @Environment(\.modelContext) private var context
-    @StateObject private var viewModel: DashboardViewModel
-    @State private var selectedTab: AppTab = .insights
-
-    init(showLogSheet: Binding<Bool>) {
-        self._showLogSheet = showLogSheet
-        // ViewModel is initialized in onAppear with context
-        self._viewModel = StateObject(wrappedValue: DashboardViewModel(context: ModelContext(try! ModelContainer(for: SleepSession.self, DailyLog.self, SleepInsight.self, SleepScore.self))))
-    }
+    @StateObject private var viewModel = DashboardViewModel()
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.sleepBackground.ignoresSafeArea()
-
                 if viewModel.isLoading && viewModel.recentSessions.isEmpty {
                     loadingView
                 } else {
@@ -27,7 +19,10 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
         }
-        .task { await viewModel.load() }
+        .task {
+            viewModel.setup(context: context)
+            await viewModel.load()
+        }
     }
 
     private var mainContent: some View {
@@ -76,10 +71,7 @@ struct DashboardView: View {
                 .foregroundStyle(.sleepPurpleLight)
                 .padding(.horizontal, Spacing.sm)
                 .padding(.vertical, Spacing.xxs)
-                .background {
-                    Capsule()
-                        .fill(Color.sleepPurpleDim)
-                }
+                .background { Capsule().fill(Color.sleepPurpleDim) }
             }
             .buttonStyle(.plain)
             .disabled(viewModel.isSyncing)
@@ -100,9 +92,7 @@ struct DashboardView: View {
                             .font(.bodyMedium)
                             .foregroundStyle(.textSecondary)
                     }
-
                     SleepScoreRingView(score: viewModel.lastNightScore, session: session)
-
                     if session.deepSleepPercent > 0 || session.remSleepPercent > 0 {
                         stageBreakdownRow(session: session)
                     }
@@ -131,7 +121,11 @@ struct DashboardView: View {
                 Circle().fill(color).frame(width: 7, height: 7)
                 Text(label).font(.caption).foregroundStyle(.textTertiary)
             }
-            Text(value).font(.labelLarge).fontWeight(.semibold).foregroundStyle(.textPrimary).monoDigits()
+            Text(value)
+                .font(.labelLarge)
+                .fontWeight(.semibold)
+                .foregroundStyle(.textPrimary)
+                .monoDigits()
         }
         .frame(maxWidth: .infinity)
     }
@@ -163,9 +157,7 @@ struct DashboardView: View {
     }
 
     private var insightCard: some View {
-        InsightCardView(insight: viewModel.currentInsight) {
-            selectedTab = .insights
-        }
+        InsightCardView(insight: viewModel.currentInsight)
     }
 
     private var checkinCard: some View {
@@ -176,8 +168,7 @@ struct DashboardView: View {
 
     private var loadingView: some View {
         VStack(spacing: Spacing.lg) {
-            LoadingRingView()
-                .frame(width: 48, height: 48)
+            LoadingRingView().frame(width: 48, height: 48)
             Text("Loading your sleep data…")
                 .font(.bodyMedium)
                 .foregroundStyle(.textSecondary)

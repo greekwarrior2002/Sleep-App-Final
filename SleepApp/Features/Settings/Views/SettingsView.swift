@@ -3,11 +3,7 @@ import SwiftData
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
-    @StateObject private var viewModel: SettingsViewModel
-
-    init() {
-        self._viewModel = StateObject(wrappedValue: SettingsViewModel(context: ModelContext(try! ModelContainer(for: SleepSession.self, DailyLog.self, SleepInsight.self, SleepScore.self))))
-    }
+    @StateObject private var viewModel = SettingsViewModel()
 
     var body: some View {
         NavigationStack {
@@ -29,6 +25,7 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .task { viewModel.setup(context: context) }
     }
 
     private var sleepGoalsSection: some View {
@@ -36,32 +33,21 @@ struct SettingsView: View {
             VStack(spacing: Spacing.md) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     HStack {
-                        Text("Sleep Goal")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textSecondary)
+                        Text("Sleep Goal").font(.bodyMedium).foregroundStyle(.textSecondary)
                         Spacer()
                         Text(String(format: "%.1fh", viewModel.sleepGoalHours))
-                            .font(.titleSmall)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.sleepPurpleLight)
+                            .font(.titleSmall).fontWeight(.semibold).foregroundStyle(.sleepPurpleLight)
                     }
                     SleepSlider(value: $viewModel.sleepGoalHours, range: 5.0...10.0, step: 0.5, trackColor: .sleepPurple)
                 }
-
                 Divider().overlay(Color.sleepBorder)
-
                 HStack {
-                    Text("Bedtime")
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textSecondary)
+                    Text("Bedtime").font(.bodyMedium).foregroundStyle(.textSecondary)
                     Spacer()
                     TimePicker(hour: $viewModel.bedtimeHour, minute: $viewModel.bedtimeMinute)
                 }
-
                 HStack {
-                    Text("Wake Time")
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textSecondary)
+                    Text("Wake Time").font(.bodyMedium).foregroundStyle(.textSecondary)
                     Spacer()
                     TimePicker(hour: $viewModel.wakeHour, minute: $viewModel.wakeMinute)
                 }
@@ -74,9 +60,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("API Key")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textSecondary)
+                        Text("API Key").font(.bodyMedium).foregroundStyle(.textSecondary)
                         Text(viewModel.claudeAPIKey.isEmpty ? "Not configured" : viewModel.maskedAPIKey)
                             .font(.labelSmall)
                             .foregroundStyle(viewModel.claudeAPIKey.isEmpty ? .textTertiary : .positive)
@@ -84,8 +68,7 @@ struct SettingsView: View {
                     }
                     Spacer()
                     if !viewModel.claudeAPIKey.isEmpty {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.positive)
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.positive)
                     }
                 }
 
@@ -99,23 +82,18 @@ struct SettingsView: View {
                             }
                         if viewModel.isAPIKeyVisible {
                             TextField("sk-ant-...", text: $viewModel.claudeAPIKey)
-                                .font(.bodyMedium)
-                                .foregroundStyle(.textPrimary)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
+                                .font(.bodyMedium).foregroundStyle(.textPrimary)
+                                .autocorrectionDisabled().textInputAutocapitalization(.never)
                                 .padding(.horizontal, Spacing.sm)
                         } else {
                             SecureField("sk-ant-...", text: $viewModel.claudeAPIKey)
-                                .font(.bodyMedium)
-                                .foregroundStyle(.textPrimary)
+                                .font(.bodyMedium).foregroundStyle(.textPrimary)
                                 .padding(.horizontal, Spacing.sm)
                         }
                     }
                     .frame(height: 44)
 
-                    Button {
-                        viewModel.isAPIKeyVisible.toggle()
-                    } label: {
+                    Button { viewModel.isAPIKeyVisible.toggle() } label: {
                         Image(systemName: viewModel.isAPIKeyVisible ? "eye.slash" : "eye")
                             .foregroundStyle(.textTertiary)
                     }
@@ -132,9 +110,8 @@ struct SettingsView: View {
                 }
                 .frame(height: 44)
 
-                Text("Get a key at console.anthropic.com. Keys are stored securely in your device's Keychain.")
-                    .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                Text("Get a key at console.anthropic.com. Stored securely in your device's Keychain.")
+                    .font(.caption).foregroundStyle(.textTertiary)
             }
         }
     }
@@ -144,9 +121,7 @@ struct SettingsView: View {
             VStack(spacing: Spacing.sm) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Bedtime Reminder")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textSecondary)
+                        Text("Bedtime Reminder").font(.bodyMedium).foregroundStyle(.textSecondary)
                         if viewModel.bedtimeReminderEnabled {
                             TimePicker(hour: $viewModel.bedtimeReminderHour, minute: $viewModel.bedtimeReminderMinute)
                                 .scaleEffect(0.85, anchor: .leading)
@@ -155,18 +130,12 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $viewModel.bedtimeReminderEnabled)
                         .tint(.sleepTeal)
-                        .onChange(of: viewModel.bedtimeReminderEnabled) { _, _ in
-                            viewModel.updateNotifications()
-                        }
+                        .onChange(of: viewModel.bedtimeReminderEnabled) { _, _ in viewModel.updateNotifications() }
                 }
-
                 Divider().overlay(Color.sleepBorder)
-
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Morning Check-in")
-                            .font(.bodyMedium)
-                            .foregroundStyle(.textSecondary)
+                        Text("Morning Check-in").font(.bodyMedium).foregroundStyle(.textSecondary)
                         if viewModel.morningCheckinEnabled {
                             TimePicker(hour: $viewModel.morningCheckinHour, minute: $viewModel.morningCheckinMinute)
                                 .scaleEffect(0.85, anchor: .leading)
@@ -175,9 +144,7 @@ struct SettingsView: View {
                     Spacer()
                     Toggle("", isOn: $viewModel.morningCheckinEnabled)
                         .tint(.sleepTeal)
-                        .onChange(of: viewModel.morningCheckinEnabled) { _, _ in
-                            viewModel.updateNotifications()
-                        }
+                        .onChange(of: viewModel.morningCheckinEnabled) { _, _ in viewModel.updateNotifications() }
                 }
             }
         }
@@ -187,16 +154,14 @@ struct SettingsView: View {
         SettingsSection(title: "Apple Health", icon: "heart.fill", iconColor: .scorePoor) {
             HStack {
                 Text("Manage HealthKit permissions")
-                    .font(.bodyMedium)
-                    .foregroundStyle(.textSecondary)
+                    .font(.bodyMedium).foregroundStyle(.textSecondary)
                 Spacer()
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 }
-                .font(.labelLarge)
-                .foregroundStyle(.sleepPurpleLight)
+                .font(.labelLarge).foregroundStyle(.sleepPurpleLight)
             }
         }
     }
@@ -205,25 +170,9 @@ struct SettingsView: View {
         SettingsSection(title: "App", icon: "info.circle.fill", iconColor: .textSecondary) {
             VStack(spacing: Spacing.sm) {
                 HStack {
-                    Text("Version")
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textSecondary)
+                    Text("Version").font(.bodyMedium).foregroundStyle(.textSecondary)
                     Spacer()
-                    Text(viewModel.appVersion)
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textTertiary)
-                }
-
-                Divider().overlay(Color.sleepBorder)
-
-                HStack {
-                    Text("Privacy Policy")
-                        .font(.bodyMedium)
-                        .foregroundStyle(.textSecondary)
-                    Spacer()
-                    Image(systemName: "arrow.up.right")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.textTertiary)
+                    Text(viewModel.appVersion).font(.bodyMedium).foregroundStyle(.textTertiary)
                 }
             }
         }
@@ -264,9 +213,7 @@ private struct SettingsSection<Content: View>: View {
                         .foregroundStyle(iconColor)
                         .frame(width: 18)
                     Text(title)
-                        .font(.titleSmall)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.textPrimary)
+                        .font(.titleSmall).fontWeight(.semibold).foregroundStyle(.textPrimary)
                 }
                 Divider().overlay(Color.sleepBorder)
                 content()

@@ -138,7 +138,7 @@ final class DashboardViewModel: ObservableObject {
         defaults?.set(score.overallScore, forKey: "widget.lastScore")
         defaults?.set(session.formattedDuration, forKey: "widget.lastDuration")
         defaults?.set(score.grade, forKey: "widget.lastGrade")
-        defaults?.set(score.trend?.rawValue ?? "stable", forKey: "widget.lastTrend")
+        defaults?.set(score.trend.rawValue, forKey: "widget.lastTrend")
         defaults?.set(session.endDate.relativeDescription, forKey: "widget.lastDate")
         WidgetCenter.shared.reloadAllTimelines()
     }

@@ -26,19 +26,27 @@ final class SettingsViewModel: ObservableObject {
     private var context: ModelContext?
 
     init() {
+        let defaults = UserDefaults.standard
         claudeAPIKey = KeychainService.shared.claudeAPIKey ?? ""
-        sleepGoalHours = UserDefaults.standard.double(forKey: Constants.UserDefaults.sleepGoalKey).isZero ? 8.0 : UserDefaults.standard.double(forKey: Constants.UserDefaults.sleepGoalKey)
-        bedtimeHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeHourKey).isZero ? 22 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeHourKey)
-        bedtimeMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeMinuteKey).isZero ? 30 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeMinuteKey)
-        wakeHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeHourKey).isZero ? 6 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeHourKey)
-        wakeMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeMinuteKey).isZero ? 30 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeMinuteKey)
-        bedtimeReminderEnabled = UserDefaults.standard.bool(forKey: Constants.UserDefaults.bedtimeReminderEnabled)
-        morningCheckinEnabled = UserDefaults.standard.bool(forKey: Constants.UserDefaults.morningCheckinEnabled)
-        bedtimeReminderHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderHour).isZero ? 22 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderHour)
-        bedtimeReminderMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderMinute)
-        morningCheckinHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinHour).isZero ? 7 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinHour)
-        morningCheckinMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinMinute)
-        hasCompletedOnboarding = UserDefaults.standard.bool(forKey: Constants.UserDefaults.hasCompletedOnboarding)
+        let goal = defaults.double(forKey: Constants.UserDefaults.sleepGoalKey)
+        sleepGoalHours = goal == 0 ? 8.0 : goal
+        let bh = defaults.integer(forKey: Constants.UserDefaults.bedtimeHourKey)
+        bedtimeHour = bh == 0 ? 22 : bh
+        let bm = defaults.integer(forKey: Constants.UserDefaults.bedtimeMinuteKey)
+        bedtimeMinute = bm == 0 ? 30 : bm
+        let wh = defaults.integer(forKey: Constants.UserDefaults.wakeHourKey)
+        wakeHour = wh == 0 ? 6 : wh
+        let wm = defaults.integer(forKey: Constants.UserDefaults.wakeMinuteKey)
+        wakeMinute = wm == 0 ? 30 : wm
+        bedtimeReminderEnabled = defaults.bool(forKey: Constants.UserDefaults.bedtimeReminderEnabled)
+        morningCheckinEnabled = defaults.bool(forKey: Constants.UserDefaults.morningCheckinEnabled)
+        let brh = defaults.integer(forKey: Constants.UserDefaults.bedtimeReminderHour)
+        bedtimeReminderHour = brh == 0 ? 22 : brh
+        bedtimeReminderMinute = defaults.integer(forKey: Constants.UserDefaults.bedtimeReminderMinute)
+        let mch = defaults.integer(forKey: Constants.UserDefaults.morningCheckinHour)
+        morningCheckinHour = mch == 0 ? 7 : mch
+        morningCheckinMinute = defaults.integer(forKey: Constants.UserDefaults.morningCheckinMinute)
+        hasCompletedOnboarding = defaults.bool(forKey: Constants.UserDefaults.hasCompletedOnboarding)
         appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
 

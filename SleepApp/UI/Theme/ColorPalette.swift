@@ -37,6 +37,32 @@ extension Color {
     static let destructive = Color(hex: "EF4444")
 }
 
+extension ShapeStyle where Self == Color {
+    static var sleepBackground: Color { .sleepBackground }
+    static var sleepSurface: Color { .sleepSurface }
+    static var sleepElevated: Color { .sleepElevated }
+    static var sleepBorder: Color { .sleepBorder }
+    static var sleepPurple: Color { .sleepPurple }
+    static var sleepPurpleLight: Color { .sleepPurpleLight }
+    static var sleepPurpleDim: Color { .sleepPurpleDim }
+    static var sleepTeal: Color { .sleepTeal }
+    static var sleepTealLight: Color { .sleepTealLight }
+    static var scoreExcellent: Color { .scoreExcellent }
+    static var scoreGood: Color { .scoreGood }
+    static var scoreFair: Color { .scoreFair }
+    static var scorePoor: Color { .scorePoor }
+    static var stageDeep: Color { .stageDeep }
+    static var stageREM: Color { .stageREM }
+    static var stageLight: Color { .stageLight }
+    static var stageAwake: Color { .stageAwake }
+    static var textPrimary: Color { .textPrimary }
+    static var textSecondary: Color { .textSecondary }
+    static var textTertiary: Color { .textTertiary }
+    static var positive: Color { .positive }
+    static var warning: Color { .warning }
+    static var destructive: Color { .destructive }
+}
+
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

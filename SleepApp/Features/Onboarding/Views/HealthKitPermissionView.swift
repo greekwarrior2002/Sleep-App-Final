@@ -5,10 +5,10 @@ struct HealthKitPermissionView: View {
     @State private var appeared = false
 
     private let permissions: [(icon: String, color: Color, title: String, desc: String)] = [
-        ("moon.zzz.fill", .sleepPurpleLight, "Sleep Analysis", "Sleep stages, duration, and efficiency"),
-        ("heart.fill", .scorePoor, "Heart Rate", "Resting HR during sleep windows"),
-        ("waveform", .positive, "HRV", "Heart rate variability for recovery tracking"),
-        ("lungs.fill", .sleepTeal, "Respiratory Rate", "Breathing patterns during sleep")
+        ("moon.zzz.fill", Color.sleepPurpleLight, "Sleep Analysis", "Sleep stages, duration, and efficiency"),
+        ("heart.fill", Color.scorePoor, "Heart Rate", "Resting HR during sleep windows"),
+        ("waveform", Color.positive, "HRV", "Heart rate variability for recovery tracking"),
+        ("lungs.fill", Color.sleepTeal, "Respiratory Rate", "Breathing patterns during sleep")
     ]
 
     var body: some View {

@@ -94,14 +94,14 @@ final class ExportService {
         UIColor(red: 0.05, green: 0.06, blue: 0.1, alpha: 1).setFill()
         UIRectFill(rect)
 
-        "Slumber Sleep Report".draw(at: CGPoint(x: margin, y: y), withAttributes: titleAttr)
+        ("Slumber Sleep Report" as NSString).draw(at: CGPoint(x: margin, y: y), withAttributes: titleAttr)
         y += 36
 
         let subAttr: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: 12),
             .foregroundColor: UIColor.lightGray
         ]
-        "Generated \(Date().longDateString) · \(sessions.count) nights".draw(at: CGPoint(x: margin, y: y), withAttributes: subAttr)
+        ("Generated \(Date().longDateString) · \(sessions.count) nights" as NSString).draw(at: CGPoint(x: margin, y: y), withAttributes: subAttr)
         y += 30
 
         // Summary stats
@@ -113,7 +113,7 @@ final class ExportService {
                 .font: UIFont.systemFont(ofSize: 14),
                 .foregroundColor: UIColor.white
             ]
-            "Avg Score: \(avgScore)   Avg Duration: \(String(format: "%.1f", avgDur))h   Nights: \(sessions.count)"
+            ("Avg Score: \(avgScore)   Avg Duration: \(String(format: "%.1f", avgDur))h   Nights: \(sessions.count)" as NSString)
                 .draw(at: CGPoint(x: margin, y: y), withAttributes: statsAttr)
             y += 30
         }
@@ -130,7 +130,7 @@ final class ExportService {
 
         UIColor(red: 0.11, green: 0.15, blue: 0.22, alpha: 1).setFill()
         UIRectFill(CGRect(x: margin, y: y, width: rect.width - 2 * margin, height: 20))
-        "Date         Score   Duration   Deep     REM     Efficiency".draw(at: CGPoint(x: margin + 4, y: y + 4), withAttributes: headerAttr)
+        ("Date         Score   Duration   Deep     REM     Efficiency" as NSString).draw(at: CGPoint(x: margin + 4, y: y + 4), withAttributes: headerAttr)
         y += 22
 
         let fmt = DateFormatter(); fmt.dateFormat = "MMM d"
@@ -141,15 +141,8 @@ final class ExportService {
                 UIRectFill(CGRect(x: margin, y: y, width: rect.width - 2 * margin, height: 18))
             }
             let score = session.score.map { "\($0.overallScore)" } ?? "—"
-            let line = String(format: "%-12s  %-6s  %-9s  %-8s  %-7s  %.0f%%",
-                (fmt.string(from: session.endDate) as NSString).utf8String!,
-                (score as NSString).utf8String!,
-                (session.formattedDuration as NSString).utf8String!,
-                (session.deepSleepDuration.shortDuration as NSString).utf8String!,
-                (session.remSleepDuration.shortDuration as NSString).utf8String!,
-                session.sleepEfficiency * 100
-            )
-            line.draw(at: CGPoint(x: margin + 4, y: y + 3), withAttributes: rowAttr)
+            let line = "\(fmt.string(from: session.endDate))  \(score)  \(session.formattedDuration)  \(session.deepSleepDuration.shortDuration)  \(session.remSleepDuration.shortDuration)  \(String(format: "%.0f", session.sleepEfficiency * 100))%"
+            (line as NSString).draw(at: CGPoint(x: margin + 4, y: y + 3), withAttributes: rowAttr)
             y += 18
         }
     }

@@ -1,0 +1,751 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000F00001 /* SleepApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00001 /* SleepApp.swift */; };
+		000000000000000000F00002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00002 /* ContentView.swift */; };
+		000000000000000000F00003 /* DailyLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00003 /* DailyLog.swift */; };
+		000000000000000000F00004 /* SleepInsight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00004 /* SleepInsight.swift */; };
+		000000000000000000F00005 /* SleepScore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00005 /* SleepScore.swift */; };
+		000000000000000000F00006 /* SleepSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00006 /* SleepSession.swift */; };
+		000000000000000000F00007 /* SleepStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00007 /* SleepStage.swift */; };
+		000000000000000000F00008 /* DailyLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00008 /* DailyLogRepository.swift */; };
+		000000000000000000F00009 /* InsightRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00009 /* InsightRepository.swift */; };
+		000000000000000000F0000A /* SleepRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000A /* SleepRepository.swift */; };
+		000000000000000000F0000B /* SleepScoreRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000B /* SleepScoreRepository.swift */; };
+		000000000000000000F0000C /* ClaudeAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000C /* ClaudeAIService.swift */; };
+		000000000000000000F0000D /* CorrelationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000D /* CorrelationEngine.swift */; };
+		000000000000000000F0000E /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000E /* HealthKitService.swift */; };
+		000000000000000000F0000F /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0000F /* KeychainService.swift */; };
+		000000000000000000F00010 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00010 /* NotificationService.swift */; };
+		000000000000000000F00011 /* SleepScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00011 /* SleepScoreEngine.swift */; };
+		000000000000000000F00012 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00012 /* Constants.swift */; };
+		000000000000000000F00013 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00013 /* DateExtensions.swift */; };
+		000000000000000000F00014 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00014 /* NumberExtensions.swift */; };
+		000000000000000000F00015 /* DailyLogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00015 /* DailyLogViewModel.swift */; };
+		000000000000000000F00016 /* DailyLogSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00016 /* DailyLogSheetView.swift */; };
+		000000000000000000F00017 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00017 /* DashboardViewModel.swift */; };
+		000000000000000000F00018 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00018 /* DashboardView.swift */; };
+		000000000000000000F00019 /* InsightCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00019 /* InsightCardView.swift */; };
+		000000000000000000F0001A /* RecentNightsChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001A /* RecentNightsChartView.swift */; };
+		000000000000000000F0001B /* SleepScoreRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001B /* SleepScoreRingView.swift */; };
+		000000000000000000F0001C /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001C /* InsightsViewModel.swift */; };
+		000000000000000000F0001D /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001D /* InsightsView.swift */; };
+		000000000000000000F0001E /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001E /* OnboardingCoordinator.swift */; };
+		000000000000000000F0001F /* FirstSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0001F /* FirstSyncView.swift */; };
+		000000000000000000F00020 /* HealthKitPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00020 /* HealthKitPermissionView.swift */; };
+		000000000000000000F00021 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00021 /* ProfileSetupView.swift */; };
+		000000000000000000F00022 /* WelcomeSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00022 /* WelcomeSplashView.swift */; };
+		000000000000000000F00023 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00023 /* SettingsViewModel.swift */; };
+		000000000000000000F00024 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00024 /* SettingsView.swift */; };
+		000000000000000000F00025 /* SleepHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00025 /* SleepHistoryViewModel.swift */; };
+		000000000000000000F00026 /* SleepBarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00026 /* SleepBarChartView.swift */; };
+		000000000000000000F00027 /* SleepHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00027 /* SleepHistoryView.swift */; };
+		000000000000000000F00028 /* SleepNightDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00028 /* SleepNightDetailView.swift */; };
+		000000000000000000F00029 /* StatsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00029 /* StatsCardView.swift */; };
+		000000000000000000F0002A /* ChipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002A /* ChipButton.swift */; };
+		000000000000000000F0002B /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002B /* GlassCard.swift */; };
+		000000000000000000F0002C /* LoadingRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002C /* LoadingRingView.swift */; };
+		000000000000000000F0002D /* MetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002D /* MetricCard.swift */; };
+		000000000000000000F0002E /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002E /* PrimaryButton.swift */; };
+		000000000000000000F0002F /* SleepSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0002F /* SleepSlider.swift */; };
+		000000000000000000F00030 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00030 /* ColorPalette.swift */; };
+		000000000000000000F00031 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00031 /* Spacing.swift */; };
+		000000000000000000F00032 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00032 /* Typography.swift */; };
+		000000000000000000F00033 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00033 /* Assets.xcassets */; };
+		000000000000000000F00036 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00036 /* HealthKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000E00001 /* SleepApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepApp.swift; sourceTree = "<group>"; };
+		000000000000000000E00002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		000000000000000000E00003 /* DailyLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyLog.swift; sourceTree = "<group>"; };
+		000000000000000000E00004 /* SleepInsight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepInsight.swift; sourceTree = "<group>"; };
+		000000000000000000E00005 /* SleepScore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepScore.swift; sourceTree = "<group>"; };
+		000000000000000000E00006 /* SleepSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepSession.swift; sourceTree = "<group>"; };
+		000000000000000000E00007 /* SleepStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepStage.swift; sourceTree = "<group>"; };
+		000000000000000000E00008 /* DailyLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyLogRepository.swift; sourceTree = "<group>"; };
+		000000000000000000E00009 /* InsightRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRepository.swift; sourceTree = "<group>"; };
+		000000000000000000E0000A /* SleepRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepRepository.swift; sourceTree = "<group>"; };
+		000000000000000000E0000B /* SleepScoreRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepScoreRepository.swift; sourceTree = "<group>"; };
+		000000000000000000E0000C /* ClaudeAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeAIService.swift; sourceTree = "<group>"; };
+		000000000000000000E0000D /* CorrelationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrelationEngine.swift; sourceTree = "<group>"; };
+		000000000000000000E0000E /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		000000000000000000E0000F /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		000000000000000000E00010 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		000000000000000000E00011 /* SleepScoreEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepScoreEngine.swift; sourceTree = "<group>"; };
+		000000000000000000E00012 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		000000000000000000E00013 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
+		000000000000000000E00014 /* NumberExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
+		000000000000000000E00015 /* DailyLogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyLogViewModel.swift; sourceTree = "<group>"; };
+		000000000000000000E00016 /* DailyLogSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyLogSheetView.swift; sourceTree = "<group>"; };
+		000000000000000000E00017 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		000000000000000000E00018 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		000000000000000000E00019 /* InsightCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightCardView.swift; sourceTree = "<group>"; };
+		000000000000000000E0001A /* RecentNightsChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentNightsChartView.swift; sourceTree = "<group>"; };
+		000000000000000000E0001B /* SleepScoreRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepScoreRingView.swift; sourceTree = "<group>"; };
+		000000000000000000E0001C /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		000000000000000000E0001D /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
+		000000000000000000E0001E /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
+		000000000000000000E0001F /* FirstSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSyncView.swift; sourceTree = "<group>"; };
+		000000000000000000E00020 /* HealthKitPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitPermissionView.swift; sourceTree = "<group>"; };
+		000000000000000000E00021 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
+		000000000000000000E00022 /* WelcomeSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeSplashView.swift; sourceTree = "<group>"; };
+		000000000000000000E00023 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		000000000000000000E00024 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		000000000000000000E00025 /* SleepHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepHistoryViewModel.swift; sourceTree = "<group>"; };
+		000000000000000000E00026 /* SleepBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepBarChartView.swift; sourceTree = "<group>"; };
+		000000000000000000E00027 /* SleepHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepHistoryView.swift; sourceTree = "<group>"; };
+		000000000000000000E00028 /* SleepNightDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepNightDetailView.swift; sourceTree = "<group>"; };
+		000000000000000000E00029 /* StatsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsCardView.swift; sourceTree = "<group>"; };
+		000000000000000000E0002A /* ChipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipButton.swift; sourceTree = "<group>"; };
+		000000000000000000E0002B /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		000000000000000000E0002C /* LoadingRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingRingView.swift; sourceTree = "<group>"; };
+		000000000000000000E0002D /* MetricCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricCard.swift; sourceTree = "<group>"; };
+		000000000000000000E0002E /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
+		000000000000000000E0002F /* SleepSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepSlider.swift; sourceTree = "<group>"; };
+		000000000000000000E00030 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		000000000000000000E00031 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
+		000000000000000000E00032 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		000000000000000000E00033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		000000000000000000E00034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		000000000000000000E00035 /* Slumber.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slumber.entitlements; sourceTree = "<group>"; };
+		000000000000000000E00036 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		000000000000000000A00006 /* Slumber.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slumber.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000B00005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000F00036 /* HealthKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000A00004 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00000 /* SleepApp */,
+				000000000000000000D0000A /* Frameworks */,
+				000000000000000000A00005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000A00005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000A00006 /* Slumber.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		000000000000000000D0000A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00036 /* HealthKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00000 /* SleepApp */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00001 /* SleepApp.swift */,
+				000000000000000000E00002 /* ContentView.swift */,
+				000000000000000000C00001 /* Core */,
+				000000000000000000C00006 /* Features */,
+				000000000000000000C00017 /* UI */,
+				000000000000000000C0001A /* Resources */,
+			);
+			path = SleepApp;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00002 /* Models */,
+				000000000000000000C00003 /* Repositories */,
+				000000000000000000C00004 /* Services */,
+				000000000000000000C00005 /* Utilities */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00003 /* DailyLog.swift */,
+				000000000000000000E00004 /* SleepInsight.swift */,
+				000000000000000000E00005 /* SleepScore.swift */,
+				000000000000000000E00006 /* SleepSession.swift */,
+				000000000000000000E00007 /* SleepStage.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00003 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00008 /* DailyLogRepository.swift */,
+				000000000000000000E00009 /* InsightRepository.swift */,
+				000000000000000000E0000A /* SleepRepository.swift */,
+				000000000000000000E0000B /* SleepScoreRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0000C /* ClaudeAIService.swift */,
+				000000000000000000E0000D /* CorrelationEngine.swift */,
+				000000000000000000E0000E /* HealthKitService.swift */,
+				000000000000000000E0000F /* KeychainService.swift */,
+				000000000000000000E00010 /* NotificationService.swift */,
+				000000000000000000E00011 /* SleepScoreEngine.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00005 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00012 /* Constants.swift */,
+				000000000000000000E00013 /* DateExtensions.swift */,
+				000000000000000000E00014 /* NumberExtensions.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00006 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00007 /* DailyLog */,
+				000000000000000000C0000A /* Dashboard */,
+				000000000000000000C0000D /* Insights */,
+				000000000000000000C00010 /* Onboarding */,
+				000000000000000000C00013 /* Settings */,
+				000000000000000000C00016 /* SleepHistory */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00007 /* DailyLog */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00008 /* ViewModels */,
+				000000000000000000C00009 /* Views */,
+			);
+			path = DailyLog;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00008 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00015 /* DailyLogViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00009 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00016 /* DailyLogSheetView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000A /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C0000B /* ViewModels */,
+				000000000000000000C0000C /* Views */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000B /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00017 /* DashboardViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00018 /* DashboardView.swift */,
+				000000000000000000E00019 /* InsightCardView.swift */,
+				000000000000000000E0001A /* RecentNightsChartView.swift */,
+				000000000000000000E0001B /* SleepScoreRingView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000D /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C0000E /* ViewModels */,
+				000000000000000000C0000F /* Views */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0001C /* InsightsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0000F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0001D /* InsightsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00010 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0001E /* OnboardingCoordinator.swift */,
+				000000000000000000C00011 /* Views */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00011 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0001F /* FirstSyncView.swift */,
+				000000000000000000E00020 /* HealthKitPermissionView.swift */,
+				000000000000000000E00021 /* ProfileSetupView.swift */,
+				000000000000000000E00022 /* WelcomeSplashView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00013 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00014 /* ViewModels */,
+				000000000000000000C00015 /* Views */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00014 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00023 /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00015 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00024 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00016 /* SleepHistory */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00020 /* ViewModels */,
+				000000000000000000C00021 /* Views */,
+			);
+			path = SleepHistory;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00020 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00025 /* SleepHistoryViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00021 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00026 /* SleepBarChartView.swift */,
+				000000000000000000E00027 /* SleepHistoryView.swift */,
+				000000000000000000E00028 /* SleepNightDetailView.swift */,
+				000000000000000000E00029 /* StatsCardView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00017 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000C00018 /* Components */,
+				000000000000000000C00019 /* Theme */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00018 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E0002A /* ChipButton.swift */,
+				000000000000000000E0002B /* GlassCard.swift */,
+				000000000000000000E0002C /* LoadingRingView.swift */,
+				000000000000000000E0002D /* MetricCard.swift */,
+				000000000000000000E0002E /* PrimaryButton.swift */,
+				000000000000000000E0002F /* SleepSlider.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		000000000000000000C00019 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00030 /* ColorPalette.swift */,
+				000000000000000000E00031 /* Spacing.swift */,
+				000000000000000000E00032 /* Typography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		000000000000000000C0001A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000E00033 /* Assets.xcassets */,
+				000000000000000000E00034 /* Info.plist */,
+				000000000000000000E00035 /* Slumber.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000B00000 /* Slumber */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000B00001 /* Build configuration list for PBXNativeTarget "Slumber" */;
+			buildPhases = (
+				000000000000000000B00004 /* Sources */,
+				000000000000000000B00005 /* Frameworks */,
+				000000000000000000B00006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Slumber;
+			productName = Slumber;
+			productReference = 000000000000000000A00006 /* Slumber.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000A00000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					000000000000000000B00000 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 000000000000000000A00001 /* Build configuration list for PBXProject "Slumber" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000A00004;
+			productRefGroup = 000000000000000000A00005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000B00000 /* Slumber */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000B00006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000F00033 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000B00004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000F00001 /* SleepApp.swift in Sources */,
+				000000000000000000F00002 /* ContentView.swift in Sources */,
+				000000000000000000F00003 /* DailyLog.swift in Sources */,
+				000000000000000000F00004 /* SleepInsight.swift in Sources */,
+				000000000000000000F00005 /* SleepScore.swift in Sources */,
+				000000000000000000F00006 /* SleepSession.swift in Sources */,
+				000000000000000000F00007 /* SleepStage.swift in Sources */,
+				000000000000000000F00008 /* DailyLogRepository.swift in Sources */,
+				000000000000000000F00009 /* InsightRepository.swift in Sources */,
+				000000000000000000F0000A /* SleepRepository.swift in Sources */,
+				000000000000000000F0000B /* SleepScoreRepository.swift in Sources */,
+				000000000000000000F0000C /* ClaudeAIService.swift in Sources */,
+				000000000000000000F0000D /* CorrelationEngine.swift in Sources */,
+				000000000000000000F0000E /* HealthKitService.swift in Sources */,
+				000000000000000000F0000F /* KeychainService.swift in Sources */,
+				000000000000000000F00010 /* NotificationService.swift in Sources */,
+				000000000000000000F00011 /* SleepScoreEngine.swift in Sources */,
+				000000000000000000F00012 /* Constants.swift in Sources */,
+				000000000000000000F00013 /* DateExtensions.swift in Sources */,
+				000000000000000000F00014 /* NumberExtensions.swift in Sources */,
+				000000000000000000F00015 /* DailyLogViewModel.swift in Sources */,
+				000000000000000000F00016 /* DailyLogSheetView.swift in Sources */,
+				000000000000000000F00017 /* DashboardViewModel.swift in Sources */,
+				000000000000000000F00018 /* DashboardView.swift in Sources */,
+				000000000000000000F00019 /* InsightCardView.swift in Sources */,
+				000000000000000000F0001A /* RecentNightsChartView.swift in Sources */,
+				000000000000000000F0001B /* SleepScoreRingView.swift in Sources */,
+				000000000000000000F0001C /* InsightsViewModel.swift in Sources */,
+				000000000000000000F0001D /* InsightsView.swift in Sources */,
+				000000000000000000F0001E /* OnboardingCoordinator.swift in Sources */,
+				000000000000000000F0001F /* FirstSyncView.swift in Sources */,
+				000000000000000000F00020 /* HealthKitPermissionView.swift in Sources */,
+				000000000000000000F00021 /* ProfileSetupView.swift in Sources */,
+				000000000000000000F00022 /* WelcomeSplashView.swift in Sources */,
+				000000000000000000F00023 /* SettingsViewModel.swift in Sources */,
+				000000000000000000F00024 /* SettingsView.swift in Sources */,
+				000000000000000000F00025 /* SleepHistoryViewModel.swift in Sources */,
+				000000000000000000F00026 /* SleepBarChartView.swift in Sources */,
+				000000000000000000F00027 /* SleepHistoryView.swift in Sources */,
+				000000000000000000F00028 /* SleepNightDetailView.swift in Sources */,
+				000000000000000000F00029 /* StatsCardView.swift in Sources */,
+				000000000000000000F0002A /* ChipButton.swift in Sources */,
+				000000000000000000F0002B /* GlassCard.swift in Sources */,
+				000000000000000000F0002C /* LoadingRingView.swift in Sources */,
+				000000000000000000F0002D /* MetricCard.swift in Sources */,
+				000000000000000000F0002E /* PrimaryButton.swift in Sources */,
+				000000000000000000F0002F /* SleepSlider.swift in Sources */,
+				000000000000000000F00030 /* ColorPalette.swift in Sources */,
+				000000000000000000F00031 /* Spacing.swift in Sources */,
+				000000000000000000F00032 /* Typography.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000A00002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_EXCEPTION = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		000000000000000000A00003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_EXCEPTION = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		000000000000000000B00002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SleepApp/Resources/Slumber.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SleepApp/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.slumber.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		000000000000000000B00003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SleepApp/Resources/Slumber.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SleepApp/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.slumber.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000A00001 /* Build configuration list for PBXProject "Slumber" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000A00002 /* Debug */,
+				000000000000000000A00003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000B00001 /* Build configuration list for PBXNativeTarget "Slumber" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000B00002 /* Debug */,
+				000000000000000000B00003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000A00000 /* Project object */;
+}

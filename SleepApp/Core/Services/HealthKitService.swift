@@ -30,7 +30,6 @@ final class HealthKitService: ObservableObject {
         // Only block sync if explicitly denied; otherwise attempt the fetch.
         let authorized = status != .sharingDenied
         if authorized { enableBackgroundDelivery() }
-        return authorized
     }
 
     private func enableBackgroundDelivery() {
@@ -214,7 +213,6 @@ final class HealthKitService: ObservableObject {
             case HKCategoryValueSleepAnalysis.asleepREM.rawValue: return .remSleep
             case HKCategoryValueSleepAnalysis.asleepCore.rawValue: return .lightSleep
             case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue: return .lightSleep
-            case HKCategoryValueSleepAnalysis.asleep.rawValue: return .lightSleep
             case HKCategoryValueSleepAnalysis.awake.rawValue: return .awake
             case HKCategoryValueSleepAnalysis.inBed.rawValue: return .inBed
             default: return .inBed
@@ -234,8 +232,7 @@ final class HealthKitService: ObservableObject {
             return value == HKCategoryValueSleepAnalysis.asleepCore.rawValue ||
                    value == HKCategoryValueSleepAnalysis.asleepDeep.rawValue ||
                    value == HKCategoryValueSleepAnalysis.asleepREM.rawValue ||
-                   value == HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue ||
-                   value == HKCategoryValueSleepAnalysis.asleep.rawValue
+                   value == HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue
         } else {
             return value == HKCategoryValueSleepAnalysis.asleep.rawValue
         }

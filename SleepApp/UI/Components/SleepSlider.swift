@@ -13,7 +13,7 @@ struct SleepSlider: View {
                 HStack {
                     Text(label)
                         .font(.labelLarge)
-                        .foregroundStyle(.textSecondary)
+                        .foregroundStyle(Color.textSecondary)
                     Spacer()
                     Text(formattedValue)
                         .font(.titleSmall)
@@ -62,11 +62,11 @@ struct StressSlider: View {
             HStack {
                 Text("Very Calm")
                     .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(Color.textTertiary)
                 Spacer()
                 Text("Very Stressed")
                     .font(.caption)
-                    .foregroundStyle(.textTertiary)
+                    .foregroundStyle(Color.textTertiary)
             }
         }
     }
@@ -84,7 +84,7 @@ struct IntensityPicker: View {
                 } label: {
                     Text(label)
                         .font(.labelLarge)
-                        .foregroundStyle(value == intensity ? .white : Color.textSecondary)
+                        .foregroundStyle(value == intensity ? Color.white : Color.textSecondary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Spacing.xs)
                         .background {

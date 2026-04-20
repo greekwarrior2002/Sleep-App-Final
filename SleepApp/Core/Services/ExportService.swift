@@ -76,8 +76,8 @@ final class ExportService {
             log.map { "\($0.stressLevel)" } ?? "",
             log.map { String(format: "%.1f", $0.alcoholUnits) } ?? "",
             log.map { "\($0.screenTimeMinutes)" } ?? "",
-            log.map { $0.moodBeforeSleep.map { "\($0)" } ?? "" } ?? "",
-            log.map { $0.moodAfterWaking.map { "\($0)" } ?? "" } ?? ""
+            log.map { $0.moodBeforeSleep > 0 ? "\($0.moodBeforeSleep)" : "" } ?? "",
+            log.map { $0.moodAfterWaking > 0 ? "\($0.moodAfterWaking)" : "" } ?? ""
         ]
         return fields.joined(separator: ",")
     }

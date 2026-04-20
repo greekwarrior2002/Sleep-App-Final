@@ -17,6 +17,7 @@ final class OnboardingViewModel: ObservableObject {
     @Published var syncComplete = false
     @Published var syncedNightsCount = 0
     @Published var healthKitDenied = false
+    @Published var error: String?
 
     @AppStorage(Constants.UserDefaults.hasCompletedOnboarding) var hasCompletedOnboarding = false
     @AppStorage(Constants.UserDefaults.sleepGoalKey) var storedGoal: Double = 8.0
@@ -42,10 +43,12 @@ final class OnboardingViewModel: ObservableObject {
 
     func requestHealthKit() async {
         do {
-            let granted = try await healthKit.requestAuthorization()
-            healthKitDenied = !granted
+            try await healthKit.requestAuthorization()
+            healthKitDenied = false
+            error = nil
         } catch {
             healthKitDenied = true
+            self.error = error.localizedDescription
         }
         advance()
     }
@@ -64,25 +67,42 @@ final class OnboardingViewModel: ObservableObject {
     private func performSync() async {
         guard let context else { return }
         isSyncing = true
+        error = nil
 
         do {
             if !healthKitDenied {
-                let start = Calendar.current.date(byAdding: .day, value: -60, to: Date()) ?? Date()
+                let calendar = Calendar.current
+                // Keep onboarding responsive: import a smaller recent window first.
+                let ninetyDaysAgo = calendar.date(byAdding: .day, value: -90, to: Date()) ?? Date()
+                let start = calendar.startOfDay(for: ninetyDaysAgo)
                 let sessions = try await healthKit.fetchSleepSessions(from: start, to: Date())
+                guard !sessions.isEmpty else {
+                    self.error = "HealthKit returned no sleep sessions for the last 90 days."
+                    syncComplete = true
+                    isSyncing = false
+                    return
+                }
                 let repo = SleepRepository(context: context)
                 try repo.upsertFromHealthKit(sessions)
                 let scoreEngine = SleepScoreEngine()
-                let allSessions = try repo.fetchAll()
+                let allSessions = try repo.fetchAll().sorted { $0.endDate < $1.endDate }
                 let scoreRepo = SleepScoreRepository(context: context)
-                for session in allSessions where session.score == nil {
-                    let recent = allSessions.filter { $0.endDate < session.endDate }.suffix(14)
-                    let score = scoreEngine.calculateScore(session: session, userGoal: sleepGoalHours * 3600, recentSessions: Array(recent))
+                // Score only recent sessions during onboarding for faster completion.
+                let sessionsToScore = Array(allSessions.suffix(30))
+                for (idx, session) in sessionsToScore.enumerated() where session.score == nil {
+                    let recent = Array(sessionsToScore.prefix(idx).suffix(14))
+                    let score = scoreEngine.calculateScore(
+                        session: session,
+                        userGoal: sleepGoalHours * 3600,
+                        recentSessions: recent
+                    )
+                    score.session = session
                     try scoreRepo.save(score)
                 }
                 syncedNightsCount = sessions.count
             }
         } catch {
-            // Continue even if sync fails
+            self.error = error.localizedDescription
         }
 
         isSyncing = false

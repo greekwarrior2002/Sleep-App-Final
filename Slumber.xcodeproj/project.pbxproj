@@ -61,6 +61,7 @@
 		000000000000000000F00038 /* BedtimeOptimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00038 /* BedtimeOptimizer.swift */; };
 		000000000000000000F00039 /* SleepDebtCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00039 /* SleepDebtCardView.swift */; };
 		000000000000000000F0003A /* BedtimeRecommendationCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0003A /* BedtimeRecommendationCardView.swift */; };
+		000000000000000000F0003B /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E0003B /* ExportService.swift */; };
 		000000000000000000F00033 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00033 /* Assets.xcassets */; };
 		000000000000000000F00036 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000000000000000000E00036 /* HealthKit.framework */; };
 /* End PBXBuildFile section */
@@ -120,6 +121,7 @@
 		000000000000000000E00038 /* BedtimeOptimizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BedtimeOptimizer.swift; sourceTree = "<group>"; };
 		000000000000000000E00039 /* SleepDebtCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDebtCardView.swift; sourceTree = "<group>"; };
 		000000000000000000E0003A /* BedtimeRecommendationCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BedtimeRecommendationCardView.swift; sourceTree = "<group>"; };
+		000000000000000000E0003B /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
 		000000000000000000E00033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		000000000000000000E00034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		000000000000000000E00035 /* Slumber.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slumber.entitlements; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 				000000000000000000E00011 /* SleepScoreEngine.swift */,
 				000000000000000000E00037 /* SleepDebtCalculator.swift */,
 				000000000000000000E00038 /* BedtimeOptimizer.swift */,
+				000000000000000000E0003B /* ExportService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -567,6 +570,7 @@
 				000000000000000000F00038 /* BedtimeOptimizer.swift in Sources */,
 				000000000000000000F00039 /* SleepDebtCardView.swift in Sources */,
 				000000000000000000F0003A /* BedtimeRecommendationCardView.swift in Sources */,
+				000000000000000000F0003B /* ExportService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

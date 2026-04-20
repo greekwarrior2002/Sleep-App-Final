@@ -13,8 +13,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var error: String?
     @Published var hasCheckedInToday = false
     @Published var todayLog: DailyLog?
-
-    @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
+    @Published var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
 
     private var sleepRepo: SleepRepository?
     private var scoreRepo: SleepScoreRepository?

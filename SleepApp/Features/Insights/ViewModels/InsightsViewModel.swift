@@ -11,8 +11,7 @@ final class InsightsViewModel: ObservableObject {
     @Published var isGenerating = false
     @Published var error: String?
     @Published var hasAPIKey = false
-
-    @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = 8.0
+    @Published var sleepGoalHours: Double = 8.0
 
     private var insightRepo: InsightRepository?
     private var sleepRepo: SleepRepository?

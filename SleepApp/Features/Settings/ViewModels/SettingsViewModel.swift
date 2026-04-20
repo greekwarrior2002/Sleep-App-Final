@@ -8,25 +8,38 @@ final class SettingsViewModel: ObservableObject {
     @Published var isAPIKeyVisible = false
     @Published var showResetConfirmation = false
     @Published var successMessage: String?
-
-    @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = 8.0
-    @AppStorage(Constants.UserDefaults.bedtimeHourKey) var bedtimeHour: Int = 22
-    @AppStorage(Constants.UserDefaults.bedtimeMinuteKey) var bedtimeMinute: Int = 30
-    @AppStorage(Constants.UserDefaults.wakeHourKey) var wakeHour: Int = 6
-    @AppStorage(Constants.UserDefaults.wakeMinuteKey) var wakeMinute: Int = 30
-    @AppStorage(Constants.UserDefaults.bedtimeReminderEnabled) var bedtimeReminderEnabled: Bool = false
-    @AppStorage(Constants.UserDefaults.morningCheckinEnabled) var morningCheckinEnabled: Bool = false
-    @AppStorage(Constants.UserDefaults.bedtimeReminderHour) var bedtimeReminderHour: Int = 22
-    @AppStorage(Constants.UserDefaults.bedtimeReminderMinute) var bedtimeReminderMinute: Int = 0
-    @AppStorage(Constants.UserDefaults.morningCheckinHour) var morningCheckinHour: Int = 7
-    @AppStorage(Constants.UserDefaults.morningCheckinMinute) var morningCheckinMinute: Int = 0
-    @AppStorage(Constants.UserDefaults.hasCompletedOnboarding) var hasCompletedOnboarding: Bool = true
+    @Published var sleepGoalHours: Double = 8.0
+    @Published var bedtimeHour: Int = 22
+    @Published var bedtimeMinute: Int = 30
+    @Published var wakeHour: Int = 6
+    @Published var wakeMinute: Int = 30
+    @Published var bedtimeReminderEnabled: Bool = false
+    @Published var morningCheckinEnabled: Bool = false
+    @Published var bedtimeReminderHour: Int = 22
+    @Published var bedtimeReminderMinute: Int = 0
+    @Published var morningCheckinHour: Int = 7
+    @Published var morningCheckinMinute: Int = 0
+    @Published var hasCompletedOnboarding: Bool = true
+    @Published var appVersion: String = ""
 
     private let notifications = NotificationService.shared
     private var context: ModelContext?
 
     init() {
-        self.claudeAPIKey = KeychainService.shared.claudeAPIKey ?? ""
+        claudeAPIKey = KeychainService.shared.claudeAPIKey ?? ""
+        sleepGoalHours = UserDefaults.standard.double(forKey: Constants.UserDefaults.sleepGoalKey).isZero ? 8.0 : UserDefaults.standard.double(forKey: Constants.UserDefaults.sleepGoalKey)
+        bedtimeHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeHourKey).isZero ? 22 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeHourKey)
+        bedtimeMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeMinuteKey).isZero ? 30 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeMinuteKey)
+        wakeHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeHourKey).isZero ? 6 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeHourKey)
+        wakeMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeMinuteKey).isZero ? 30 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeMinuteKey)
+        bedtimeReminderEnabled = UserDefaults.standard.bool(forKey: Constants.UserDefaults.bedtimeReminderEnabled)
+        morningCheckinEnabled = UserDefaults.standard.bool(forKey: Constants.UserDefaults.morningCheckinEnabled)
+        bedtimeReminderHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderHour).isZero ? 22 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderHour)
+        bedtimeReminderMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.bedtimeReminderMinute)
+        morningCheckinHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinHour).isZero ? 7 : UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinHour)
+        morningCheckinMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.morningCheckinMinute)
+        hasCompletedOnboarding = UserDefaults.standard.bool(forKey: Constants.UserDefaults.hasCompletedOnboarding)
+        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
 
     func setup(context: ModelContext) {
@@ -39,7 +52,23 @@ final class SettingsViewModel: ObservableObject {
         showSuccess("API key saved")
     }
 
+    func syncToUserDefaults() {
+        UserDefaults.standard.set(sleepGoalHours, forKey: Constants.UserDefaults.sleepGoalKey)
+        UserDefaults.standard.set(bedtimeHour, forKey: Constants.UserDefaults.bedtimeHourKey)
+        UserDefaults.standard.set(bedtimeMinute, forKey: Constants.UserDefaults.bedtimeMinuteKey)
+        UserDefaults.standard.set(wakeHour, forKey: Constants.UserDefaults.wakeHourKey)
+        UserDefaults.standard.set(wakeMinute, forKey: Constants.UserDefaults.wakeMinuteKey)
+        UserDefaults.standard.set(bedtimeReminderEnabled, forKey: Constants.UserDefaults.bedtimeReminderEnabled)
+        UserDefaults.standard.set(morningCheckinEnabled, forKey: Constants.UserDefaults.morningCheckinEnabled)
+        UserDefaults.standard.set(bedtimeReminderHour, forKey: Constants.UserDefaults.bedtimeReminderHour)
+        UserDefaults.standard.set(bedtimeReminderMinute, forKey: Constants.UserDefaults.bedtimeReminderMinute)
+        UserDefaults.standard.set(morningCheckinHour, forKey: Constants.UserDefaults.morningCheckinHour)
+        UserDefaults.standard.set(morningCheckinMinute, forKey: Constants.UserDefaults.morningCheckinMinute)
+        UserDefaults.standard.set(hasCompletedOnboarding, forKey: Constants.UserDefaults.hasCompletedOnboarding)
+    }
+
     func updateNotifications() {
+        syncToUserDefaults()
         Task {
             if bedtimeReminderEnabled {
                 let authorized = await notifications.requestPermission()
@@ -82,9 +111,5 @@ final class SettingsViewModel: ObservableObject {
     var maskedAPIKey: String {
         guard !claudeAPIKey.isEmpty else { return "" }
         return String(claudeAPIKey.prefix(8)) + String(repeating: "•", count: 20)
-    }
-
-    var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
 }

@@ -19,8 +19,7 @@ final class SleepHistoryViewModel: ObservableObject {
     @Published var sessions: [SleepSession] = []
     @Published var selectedSession: SleepSession?
     @Published var isLoading = false
-
-    @AppStorage(Constants.UserDefaults.sleepGoalKey) var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
+    @Published var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
 
     private var sleepRepo: SleepRepository?
 

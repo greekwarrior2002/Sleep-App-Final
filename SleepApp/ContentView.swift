@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: AppTab = .dashboard
     @State private var showLogSheet = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -13,11 +14,13 @@ struct ContentView: View {
                     .tag(AppTab.history)
                 InsightsView()
                     .tag(AppTab.insights)
+                SleepChatView()
+                    .tag(AppTab.chat)
                 SettingsView()
                     .tag(AppTab.settings)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .animation(.easeInOut(duration: 0.2), value: selectedTab)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: selectedTab)
 
             SleepTabBar(selectedTab: $selectedTab, showLogSheet: $showLogSheet)
         }
@@ -29,13 +32,14 @@ struct ContentView: View {
 }
 
 enum AppTab: Int, CaseIterable {
-    case dashboard, history, insights, settings
+    case dashboard, history, insights, chat, settings
 
     var icon: String {
         switch self {
         case .dashboard: return "moon.stars.fill"
         case .history: return "chart.bar.fill"
         case .insights: return "sparkles"
+        case .chat: return "bubble.left.and.bubble.right.fill"
         case .settings: return "gearshape.fill"
         }
     }
@@ -45,6 +49,7 @@ enum AppTab: Int, CaseIterable {
         case .dashboard: return "Sleep"
         case .history: return "History"
         case .insights: return "Insights"
+        case .chat: return "Coach"
         case .settings: return "Settings"
         }
     }
@@ -57,7 +62,7 @@ struct SleepTabBar: View {
     var body: some View {
         HStack(spacing: 0) {
             ForEach(AppTab.allCases, id: \.rawValue) { tab in
-                if tab == .history {
+                if tab == .insights {
                     tabButton(tab)
                     Spacer()
                     logButton

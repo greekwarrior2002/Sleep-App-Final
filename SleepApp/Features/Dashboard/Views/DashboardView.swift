@@ -56,6 +56,15 @@ struct DashboardView: View {
                 statsRow
                 recentChart
                 insightCard
+                if let debt = viewModel.weeklyDebt {
+                    SleepDebtCardView(debt: debt)
+                }
+                if !viewModel.bedtimeWindows.isEmpty {
+                    BedtimeRecommendationCardView(
+                        windows: viewModel.bedtimeWindows,
+                        wakeTime: viewModel.wakeTimeString
+                    )
+                }
                 if !viewModel.hasCheckedInToday {
                     checkinCard
                 }

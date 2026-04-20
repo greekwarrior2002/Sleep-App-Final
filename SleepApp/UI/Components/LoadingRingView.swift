@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LoadingRingView: View {
     @State private var isAnimating = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -18,9 +19,9 @@ struct LoadingRingView: View {
                     ),
                     style: StrokeStyle(lineWidth: 4, lineCap: .round)
                 )
-                .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                .rotationEffect(.degrees(isAnimating && !reduceMotion ? 360 : 0))
                 .animation(
-                    .linear(duration: 1.0).repeatForever(autoreverses: false),
+                    reduceMotion ? nil : .linear(duration: 1.0).repeatForever(autoreverses: false),
                     value: isAnimating
                 )
         }

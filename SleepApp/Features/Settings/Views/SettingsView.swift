@@ -15,6 +15,8 @@ struct SettingsView: View {
                         aiSection
                         notificationsSection
                         healthKitSection
+                        iCloudSection
+                        exportSection
                         appSection
                         resetSection
                         Spacer(minLength: 100)
@@ -26,6 +28,37 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .task { viewModel.setup(context: context) }
+        .sheet(isPresented: $viewModel.showExportSheet) {
+            if let url = viewModel.exportURL {
+                ShareSheet(items: [url])
+            }
+        }
+    }
+
+    private var exportSection: some View {
+        SettingsSection(title: "Export Data", icon: "square.and.arrow.up.fill", iconColor: .sleepTealLight) {
+            VStack(spacing: Spacing.sm) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("CSV Spreadsheet").font(.bodyMedium).foregroundStyle(.textSecondary)
+                        Text("All nights, scores & lifestyle logs").font(.caption).foregroundStyle(.textTertiary)
+                    }
+                    Spacer()
+                    Button("Export") { Task { await viewModel.exportCSV() } }
+                        .font(.labelLarge).foregroundStyle(.sleepTealLight)
+                }
+                Divider().overlay(Color.sleepBorder)
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("PDF Report").font(.bodyMedium).foregroundStyle(.textSecondary)
+                        Text("30-day formatted summary report").font(.caption).foregroundStyle(.textTertiary)
+                    }
+                    Spacer()
+                    Button("Export") { Task { await viewModel.exportPDF() } }
+                        .font(.labelLarge).foregroundStyle(.sleepTealLight)
+                }
+            }
+        }
     }
 
     private var sleepGoalsSection: some View {
@@ -166,6 +199,34 @@ struct SettingsView: View {
         }
     }
 
+    private var iCloudSection: some View {
+        SettingsSection(title: "iCloud Sync", icon: "icloud.fill", iconColor: .sleepTealLight) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Sync across devices").font(.bodyMedium).foregroundStyle(.textSecondary)
+                    Text(iCloudStatusText).font(.caption).foregroundStyle(.textTertiary)
+                }
+                Spacer()
+                Image(systemName: iCloudStatusIcon)
+                    .foregroundStyle(iCloudStatusColor)
+            }
+        }
+    }
+
+    private var iCloudStatusText: String {
+        FileManager.default.ubiquityIdentityToken != nil
+            ? "Signed in to iCloud — data syncing automatically"
+            : "Sign in to iCloud in device Settings to enable sync"
+    }
+
+    private var iCloudStatusIcon: String {
+        FileManager.default.ubiquityIdentityToken != nil ? "checkmark.circle.fill" : "xmark.circle"
+    }
+
+    private var iCloudStatusColor: Color {
+        FileManager.default.ubiquityIdentityToken != nil ? .positive : .textTertiary
+    }
+
     private var appSection: some View {
         SettingsSection(title: "App", icon: "info.circle.fill", iconColor: .textSecondary) {
             VStack(spacing: Spacing.sm) {
@@ -173,6 +234,19 @@ struct SettingsView: View {
                     Text("Version").font(.bodyMedium).foregroundStyle(.textSecondary)
                     Spacer()
                     Text(viewModel.appVersion).font(.bodyMedium).foregroundStyle(.textTertiary)
+                }
+                Divider().overlay(Color.sleepBorder)
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Data Retention").font(.bodyMedium).foregroundStyle(.textSecondary)
+                        Text("Auto-removes data older than 180 days")
+                            .font(.caption).foregroundStyle(.textTertiary)
+                    }
+                    Spacer()
+                    Button("Clean Now") {
+                        Task { await viewModel.runDataCleanup() }
+                    }
+                    .font(.labelLarge).foregroundStyle(.sleepPurpleLight)
                 }
             }
         }
@@ -196,6 +270,14 @@ struct SettingsView: View {
             Text("This will delete all sleep sessions, daily logs, insights, and your API key. This cannot be undone.")
         }
     }
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 private struct SettingsSection<Content: View>: View {

@@ -15,8 +15,15 @@ final class SleepHistoryViewModel: ObservableObject {
         }
     }
 
+    enum ViewMode: String, CaseIterable {
+        case chart = "Chart"
+        case calendar = "Calendar"
+    }
+
     @Published var selectedPeriod: Period = .week
+    @Published var selectedViewMode: ViewMode = .chart
     @Published var sessions: [SleepSession] = []
+    @Published var allSessions: [SleepSession] = []
     @Published var selectedSession: SleepSession?
     @Published var isLoading = false
     @Published var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
@@ -34,9 +41,20 @@ final class SleepHistoryViewModel: ObservableObject {
         defer { isLoading = false }
         do {
             sessions = try sleepRepo.fetchRecent(days: selectedPeriod.rawValue)
+            if allSessions.isEmpty {
+                allSessions = try sleepRepo.fetchRecent(days: 365)
+            }
         } catch {
             sessions = []
         }
+    }
+
+    var sessionsByDate: [Date: SleepSession] {
+        var map: [Date: SleepSession] = [:]
+        for session in allSessions {
+            map[session.calendarDate] = session
+        }
+        return map
     }
 
     var displaySessions: [SleepSession] {

@@ -14,6 +14,7 @@ struct SleepHistoryView: View {
             }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbarContent }
         }
         .task {
             viewModel.setup(context: context)
@@ -24,14 +25,33 @@ struct SleepHistoryView: View {
         }
     }
 
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            Picker("View", selection: $viewModel.selectedViewMode) {
+                ForEach(SleepHistoryViewModel.ViewMode.allCases, id: \.rawValue) { mode in
+                    Text(mode.rawValue).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 140)
+        }
+    }
+
     private var content: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: Spacing.lg) {
-                periodPicker
-                    .padding(.horizontal, Spacing.md)
+                if viewModel.selectedViewMode == .chart {
+                    periodPicker.padding(.horizontal, Spacing.md)
+                }
 
-                if viewModel.sessions.isEmpty {
+                if viewModel.sessions.isEmpty && viewModel.selectedViewMode == .chart {
                     emptyState
+                } else if viewModel.selectedViewMode == .calendar {
+                    CalendarHeatmapView(sessionsByDate: viewModel.sessionsByDate) { session in
+                        selectedSession = session
+                    }
+                    .padding(.horizontal, Spacing.md)
                 } else {
                     VStack(spacing: Spacing.md) {
                         SleepBarChartView(
@@ -40,7 +60,7 @@ struct SleepHistoryView: View {
                             selectedSession: $selectedSession
                         )
                         if viewModel.displaySessions.count >= 3 {
-                            StageAreaChartView(sessions: viewModel.displaySessions)
+                            StageAreaChartView(sessions: viewModel.displaySessions, period: viewModel.selectedPeriod)
                         }
                         StatsCardView(viewModel: viewModel)
                         nightsList

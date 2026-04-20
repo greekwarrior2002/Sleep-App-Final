@@ -5,6 +5,7 @@ struct SleepScoreRingView: View {
     var session: SleepSession?
     @State private var animatedScore: Double = 0
     @State private var hasAppeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var scoreValue: Int { score?.overallScore ?? 0 }
     private var ringColor: Color { .scoreColor(for: scoreValue) }
@@ -26,13 +27,21 @@ struct SleepScoreRingView: View {
         .onAppear {
             guard !hasAppeared else { return }
             hasAppeared = true
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2)) {
+            if reduceMotion {
                 animatedScore = Double(scoreValue)
+            } else {
+                withAnimation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2)) {
+                    animatedScore = Double(scoreValue)
+                }
             }
         }
         .onChange(of: scoreValue) { _, new in
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+            if reduceMotion {
                 animatedScore = Double(new)
+            } else {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                    animatedScore = Double(new)
+                }
             }
         }
     }

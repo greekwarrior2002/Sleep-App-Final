@@ -26,7 +26,9 @@ final class HealthKitService: ObservableObject {
         try await store.requestAuthorization(toShare: [], read: readTypes)
         let status = store.authorizationStatus(for: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!)
         await MainActor.run { authorizationStatus = status }
-        return status == .sharingAuthorized
+        // HealthKit never returns .sharingAuthorized for read-only types (privacy by design).
+        // Only block sync if explicitly denied; otherwise attempt the fetch.
+        return status != .sharingDenied
     }
 
     func fetchSleepSessions(from startDate: Date, to endDate: Date) async throws -> [SleepSession] {

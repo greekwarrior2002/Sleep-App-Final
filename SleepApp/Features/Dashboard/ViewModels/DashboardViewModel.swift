@@ -66,13 +66,19 @@ final class DashboardViewModel: ObservableObject {
     func syncHealthKit() async {
         guard let sleepRepo, let scoreRepo else { return }
         isSyncing = true
+        error = nil
         defer { isSyncing = false }
         do {
-            let authorized = try await healthKit.requestAuthorization()
-            guard authorized else { return }
+            try await healthKit.requestAuthorization()
 
-            let start = Calendar.current.date(byAdding: .day, value: -60, to: Date()) ?? Date()
+            let calendar = Calendar.current
+            let oneYearAgo = calendar.date(byAdding: .day, value: -365, to: Date()) ?? Date()
+            let start = calendar.startOfDay(for: oneYearAgo)
             let sessions = try await healthKit.fetchSleepSessions(from: start, to: Date())
+            guard !sessions.isEmpty else {
+                error = "HealthKit returned no sleep sessions for the last year."
+                return
+            }
             try sleepRepo.upsertFromHealthKit(sessions)
 
             let allSessions = try sleepRepo.fetchAll()

@@ -21,7 +21,7 @@ final class HealthKitService: ObservableObject {
 
     private init() {}
 
-    func requestAuthorization() async throws -> Bool {
+    func requestAuthorization() async throws {
         guard isAvailable else { throw HealthKitError.notAvailable }
         try await store.requestAuthorization(toShare: [], read: readTypes)
         let status = store.authorizationStatus(for: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!)
@@ -53,7 +53,10 @@ final class HealthKitService: ObservableObject {
 
     private func fetchRawSleepSamples(from start: Date, to end: Date) async throws -> [HKCategorySample] {
         let type = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        // Match any sleep sample that overlaps the requested window. Using
+        // `.strictStartDate` drops nights that began before the cutoff but ended
+        // within it, which makes recent imports look empty or incomplete.
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 
         return try await withCheckedThrowingContinuation { continuation in
@@ -75,62 +78,78 @@ final class HealthKitService: ObservableObject {
 
     private func groupSamplesIntoSessions(_ samples: [HKCategorySample]) -> [[HKCategorySample]] {
         let gapThreshold: TimeInterval = 30 * 60
-
-        var bySource: [String: [HKCategorySample]] = [:]
-        for sample in samples {
-            let key = sample.sourceRevision.source.bundleIdentifier
-            bySource[key, default: []].append(sample)
+        let sorted = samples.sorted { lhs, rhs in
+            if lhs.startDate == rhs.startDate {
+                return lhs.endDate < rhs.endDate
+            }
+            return lhs.startDate < rhs.startDate
         }
 
         var sessions: [[HKCategorySample]] = []
-        for (_, sourceSamples) in bySource {
-            let sorted = sourceSamples.sorted { $0.startDate < $1.startDate }
-            var currentGroup: [HKCategorySample] = []
+        var currentGroup: [HKCategorySample] = []
 
-            for sample in sorted {
-                if currentGroup.isEmpty {
-                    currentGroup.append(sample)
-                } else if let last = currentGroup.last,
-                          sample.startDate.timeIntervalSince(last.endDate) <= gapThreshold {
-                    currentGroup.append(sample)
-                } else {
-                    if isSleepSession(currentGroup) { sessions.append(currentGroup) }
-                    currentGroup = [sample]
-                }
+        for sample in sorted {
+            if currentGroup.isEmpty {
+                currentGroup.append(sample)
+                continue
             }
-            if !currentGroup.isEmpty && isSleepSession(currentGroup) {
-                sessions.append(currentGroup)
+
+            guard let groupEnd = currentGroup.map(\.endDate).max() else {
+                currentGroup = [sample]
+                continue
             }
+
+            if sample.startDate.timeIntervalSince(groupEnd) <= gapThreshold {
+                currentGroup.append(sample)
+            } else {
+                if isSleepSession(currentGroup) { sessions.append(currentGroup) }
+                currentGroup = [sample]
+            }
+        }
+
+        if !currentGroup.isEmpty && isSleepSession(currentGroup) {
+            sessions.append(currentGroup)
         }
 
         return sessions
     }
 
     private func isSleepSession(_ samples: [HKCategorySample]) -> Bool {
-        let hasAsleepSample = samples.contains { sample in
-            if #available(iOS 16.0, *) {
-                return sample.value == HKCategoryValueSleepAnalysis.asleepCore.rawValue ||
-                       sample.value == HKCategoryValueSleepAnalysis.asleepDeep.rawValue ||
-                       sample.value == HKCategoryValueSleepAnalysis.asleepREM.rawValue ||
-                       sample.value == HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue
-            } else {
-                return sample.value == HKCategoryValueSleepAnalysis.asleep.rawValue
-            }
-        }
-        guard hasAsleepSample else { return false }
-        let totalSpan = samples.last!.endDate.timeIntervalSince(samples.first!.startDate)
-        return totalSpan >= 60 * 60
+        guard let first = samples.first, let last = samples.last else { return false }
+        let totalSpan = last.endDate.timeIntervalSince(first.startDate)
+        guard totalSpan >= 60 * 60 else { return false }
+
+        let hasAsleepSample = samples.contains { isAsleepValue($0.value) }
+        if hasAsleepSample { return true }
+
+        // Some sources write only "in bed" samples. Accept long in-bed sessions
+        // so users still get a usable nightly import.
+        let hasInBedSample = samples.contains { isInBedValue($0.value) }
+        return hasInBedSample && totalSpan >= 3 * 60 * 60
     }
 
     private func buildSession(from samples: [HKCategorySample]) async -> SleepSession? {
-        guard let first = samples.first, let last = samples.last else { return nil }
+        guard !samples.isEmpty else { return nil }
+        let sortedSamples = samples.sorted { lhs, rhs in
+            if lhs.startDate == rhs.startDate {
+                return lhs.endDate < rhs.endDate
+            }
+            return lhs.startDate < rhs.startDate
+        }
+        guard let first = sortedSamples.first,
+              let last = sortedSamples.max(by: { $0.endDate < $1.endDate }) else { return nil }
 
-        let source = first.sourceRevision.source
+        let preferredSource = Dictionary(grouping: sortedSamples, by: \.sourceRevision.source.bundleIdentifier)
+            .max { lhs, rhs in lhs.value.count < rhs.value.count }?
+            .value
+            .first?
+            .sourceRevision
+            .source ?? first.sourceRevision.source
         let session = SleepSession(
             startDate: first.startDate,
             endDate: last.endDate,
-            sourceApp: source.name,
-            sourceIdentifier: source.bundleIdentifier
+            sourceApp: preferredSource.name,
+            sourceIdentifier: preferredSource.bundleIdentifier
         )
 
         var stages: [SleepStageEntry] = []
@@ -140,7 +159,7 @@ final class HealthKitService: ObservableObject {
         var awakeDuration: TimeInterval = 0
         var asleepDuration: TimeInterval = 0
 
-        for sample in samples {
+        for sample in sortedSamples {
             let dur = sample.endDate.timeIntervalSince(sample.startDate)
             let stage = mapHKSleepValue(sample.value)
             stages.append(SleepStageEntry(stage: stage, startDate: sample.startDate, endDate: sample.endDate))
@@ -163,13 +182,19 @@ final class HealthKitService: ObservableObject {
         }
 
         session.stages = stages
-        session.totalDuration = asleepDuration
         session.timeInBed = last.endDate.timeIntervalSince(first.startDate)
+        if asleepDuration > 0 {
+            session.totalDuration = asleepDuration
+        } else if session.timeInBed > awakeDuration {
+            session.totalDuration = session.timeInBed - awakeDuration
+        } else {
+            session.totalDuration = session.timeInBed
+        }
         session.deepSleepDuration = deepDuration
         session.remSleepDuration = remDuration
         session.lightSleepDuration = lightDuration
         session.awakeDuration = awakeDuration
-        session.sleepEfficiency = session.timeInBed > 0 ? asleepDuration / session.timeInBed : 0
+        session.sleepEfficiency = session.timeInBed > 0 ? session.totalDuration / session.timeInBed : 0
 
         let interval = DateInterval(start: first.startDate, end: last.endDate)
         if let hr = try? await fetchAverageHeartRate(during: interval) {
@@ -189,6 +214,7 @@ final class HealthKitService: ObservableObject {
             case HKCategoryValueSleepAnalysis.asleepREM.rawValue: return .remSleep
             case HKCategoryValueSleepAnalysis.asleepCore.rawValue: return .lightSleep
             case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue: return .lightSleep
+            case HKCategoryValueSleepAnalysis.asleep.rawValue: return .lightSleep
             case HKCategoryValueSleepAnalysis.awake.rawValue: return .awake
             case HKCategoryValueSleepAnalysis.inBed.rawValue: return .inBed
             default: return .inBed
@@ -201,6 +227,22 @@ final class HealthKitService: ObservableObject {
             default: return .inBed
             }
         }
+    }
+
+    private func isAsleepValue(_ value: Int) -> Bool {
+        if #available(iOS 16.0, *) {
+            return value == HKCategoryValueSleepAnalysis.asleepCore.rawValue ||
+                   value == HKCategoryValueSleepAnalysis.asleepDeep.rawValue ||
+                   value == HKCategoryValueSleepAnalysis.asleepREM.rawValue ||
+                   value == HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue ||
+                   value == HKCategoryValueSleepAnalysis.asleep.rawValue
+        } else {
+            return value == HKCategoryValueSleepAnalysis.asleep.rawValue
+        }
+    }
+
+    private func isInBedValue(_ value: Int) -> Bool {
+        value == HKCategoryValueSleepAnalysis.inBed.rawValue
     }
 
     private func fetchAverageHeartRate(during interval: DateInterval) async throws -> Double? {

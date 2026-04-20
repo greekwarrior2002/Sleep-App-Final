@@ -23,11 +23,34 @@ struct DashboardView: View {
             viewModel.setup(context: context)
             await viewModel.load()
         }
+        .alert("Health Sync Failed", isPresented: errorAlertIsPresented) {
+            Button("OK", role: .cancel) {
+                viewModel.error = nil
+            }
+        } message: {
+            Text(viewModel.error ?? "An unknown HealthKit error occurred.")
+        }
+    }
+
+    private var errorAlertIsPresented: Binding<Bool> {
+        Binding(
+            get: { viewModel.error != nil },
+            set: { isPresented in
+                if !isPresented {
+                    viewModel.error = nil
+                }
+            }
+        )
     }
 
     private var mainContent: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: Spacing.lg) {
+                if let error = viewModel.error {
+                    syncStatusBanner(text: error, isError: true)
+                } else if viewModel.isSyncing {
+                    syncStatusBanner(text: "Syncing Apple Health data...", isError: false)
+                }
                 headerSection
                 heroSection
                 statsRow
@@ -49,6 +72,23 @@ struct DashboardView: View {
             }
             .padding(.horizontal, Spacing.md)
             .padding(.top, Spacing.sm)
+        }
+    }
+
+    private func syncStatusBanner(text: String, isError: Bool) -> some View {
+        HStack(spacing: Spacing.sm) {
+            Image(systemName: isError ? "exclamationmark.triangle.fill" : "arrow.triangle.2.circlepath")
+                .foregroundStyle(isError ? Color.scorePoor : Color.sleepTealLight)
+            Text(text)
+                .font(.bodyMedium)
+                .foregroundStyle(.textPrimary)
+                .multilineTextAlignment(.leading)
+            Spacer(minLength: 0)
+        }
+        .padding(Spacing.md)
+        .background {
+            RoundedRectangle(cornerRadius: Radius.md)
+                .fill(isError ? Color.scorePoor.opacity(0.12) : Color.sleepTeal.opacity(0.12))
         }
     }
 

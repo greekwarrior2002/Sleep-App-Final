@@ -33,7 +33,7 @@ extension Array where Element: BinaryFloatingPoint {
     var standardDeviation: Element {
         guard count > 1 else { return 0 }
         let avg = mean
-        let variance = map { pow($0 - avg, 2) }.reduce(0, +) / Element(count - 1)
+        let variance = map { (value: Element) -> Element in pow(value - avg, 2) }.reduce(0, +) / Element(count - 1)
         return sqrt(variance)
     }
 }

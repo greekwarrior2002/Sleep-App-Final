@@ -105,6 +105,7 @@ struct SleepBarChartView: View {
 
 struct StageAreaChartView: View {
     let sessions: [SleepSession]
+    var period: SleepHistoryViewModel.Period = .week
 
     private var displaySessions: [SleepSession] {
         sessions.sorted { $0.startDate < $1.startDate }
@@ -139,7 +140,7 @@ struct StageAreaChartView: View {
                         y: .value("Hours", point.hours)
                     )
                     .foregroundStyle(by: .value("Stage", point.stage))
-                    .interpolationMethod(.catmullRom)
+                    .interpolationMethod(period == .quarter ? .linear : .catmullRom)
                 }
                 .chartForegroundStyleScale([
                     "Deep": Color.stageDeep,

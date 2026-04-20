@@ -12,6 +12,14 @@ final class InsightsViewModel: ObservableObject {
     @Published var error: String?
     @Published var hasAPIKey = false
     @Published var sleepGoalHours: Double = 8.0
+    @Published var visibleInsightCount: Int = 3
+    private var lastGeneratedAt: Date?
+
+    var canRefresh: Bool {
+        guard !isGenerating, hasAPIKey else { return false }
+        guard let last = lastGeneratedAt else { return true }
+        return Date().timeIntervalSince(last) > 30
+    }
 
     private var insightRepo: InsightRepository?
     private var sleepRepo: SleepRepository?
@@ -81,9 +89,22 @@ final class InsightsViewModel: ObservableObject {
             )
             try insightRepo.save(insight, sessionCount: sessions.count)
             currentInsight = insight
+            lastGeneratedAt = Date()
             pastInsights = try insightRepo.fetchHistory(limit: 10)
         } catch {
             self.error = error.localizedDescription
         }
+    }
+
+    var visibleInsights: [SleepInsight] {
+        Array(pastInsights.dropFirst().prefix(visibleInsightCount))
+    }
+
+    var hasMoreInsights: Bool {
+        pastInsights.dropFirst().count > visibleInsightCount
+    }
+
+    func loadMoreInsights() {
+        visibleInsightCount += 3
     }
 }

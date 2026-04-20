@@ -2,9 +2,9 @@ import SwiftUI
 
 extension Color {
     // MARK: - Backgrounds
-    static let sleepBackground = Color(hex: "0A0E1A")
-    static let sleepSurface = Color(hex: "111827")
-    static let sleepElevated = Color(hex: "1C2333")
+    static let sleepBackground = Color.black
+    static let sleepSurface = Color(hex: "0A0E1A")
+    static let sleepElevated = Color(hex: "111827")
     static let sleepBorder = Color(hex: "2D3748").opacity(0.6)
 
     // MARK: - Accents

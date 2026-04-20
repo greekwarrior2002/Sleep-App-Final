@@ -24,6 +24,7 @@ final class SettingsViewModel: ObservableObject {
 
     private let notifications = NotificationService.shared
     private var context: ModelContext?
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         let defaults = UserDefaults.standard
@@ -48,6 +49,12 @@ final class SettingsViewModel: ObservableObject {
         morningCheckinMinute = defaults.integer(forKey: Constants.UserDefaults.morningCheckinMinute)
         hasCompletedOnboarding = defaults.bool(forKey: Constants.UserDefaults.hasCompletedOnboarding)
         appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+
+        $sleepGoalHours
+            .dropFirst()
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .sink { [weak self] _ in self?.syncToUserDefaults() }
+            .store(in: &cancellables)
     }
 
     func setup(context: ModelContext) {
@@ -91,6 +98,42 @@ final class SettingsViewModel: ObservableObject {
             if morningCheckinEnabled {
                 notifications.scheduleMorningCheckin(hour: morningCheckinHour, minute: morningCheckinMinute)
             }
+        }
+    }
+
+    @Published var exportURL: URL?
+    @Published var showExportSheet = false
+
+    func exportCSV() async {
+        guard let context else { return }
+        let sleepRepo = SleepRepository(context: context)
+        let logRepo = DailyLogRepository(context: context)
+        guard let sessions = try? sleepRepo.fetchAll(),
+              let logs = try? logRepo.fetchAll() else { return }
+        if let url = ExportService.shared.generateCSV(sessions: sessions, logs: logs) {
+            exportURL = url
+            showExportSheet = true
+        }
+    }
+
+    func exportPDF() async {
+        guard let context else { return }
+        let sleepRepo = SleepRepository(context: context)
+        guard let sessions = try? sleepRepo.fetchAll() else { return }
+        if let url = ExportService.shared.generatePDFReport(sessions: sessions) {
+            exportURL = url
+            showExportSheet = true
+        }
+    }
+
+    func runDataCleanup() async {
+        guard let context else { return }
+        let repo = SleepRepository(context: context)
+        let removed = (try? repo.deleteOlderThan(days: 180)) ?? 0
+        if removed > 0 {
+            showSuccess("Removed \(removed) old session\(removed == 1 ? "" : "s")")
+        } else {
+            showSuccess("Nothing to clean up")
         }
     }
 

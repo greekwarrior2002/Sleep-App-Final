@@ -28,7 +28,7 @@ final class ClaudeAIService: ObservableObject {
             messages: [ClaudeMessage(role: "user", content: prompt)]
         )
 
-        var request = URLRequest(url: baseURL)
+        var request = URLRequest(url: baseURL, timeoutInterval: 30.0)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
@@ -47,6 +47,63 @@ final class ClaudeAIService: ObservableObject {
         }
 
         return try parseResponse(data: data, sessions: recentSessions)
+    }
+
+    func sendChatMessage(
+        history: [(role: String, content: String)],
+        userMessage: String,
+        sleepContext: String
+    ) async throws -> String {
+        guard let apiKey = KeychainService.shared.claudeAPIKey, !apiKey.isEmpty else {
+            throw AIError.missingAPIKey
+        }
+
+        var messages = history.map { ClaudeMessage(role: $0.role, content: $0.content) }
+        messages.append(ClaudeMessage(role: "user", content: userMessage))
+
+        let chatSystem = """
+        You are a friendly sleep coach helping a user understand their personal sleep data. \
+        Answer concisely and specifically using the data provided. Don't repeat the question. \
+        Keep answers under 3 sentences unless a longer explanation is requested.
+
+        USER'S RECENT SLEEP DATA:
+        \(sleepContext)
+        """
+
+        let requestBody = ClaudeRequest(
+            model: model,
+            maxTokens: 500,
+            system: chatSystem,
+            messages: messages
+        )
+
+        var request = URLRequest(url: baseURL, timeoutInterval: 30.0)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AIError.networkError("Invalid response")
+        }
+        guard httpResponse.statusCode == 200 else {
+            if httpResponse.statusCode == 401 { throw AIError.invalidAPIKey }
+            throw AIError.apiError(httpResponse.statusCode, "")
+        }
+
+        let decoded = try JSONDecoder().decode(ClaudeResponse.self, from: data)
+        return decoded.content.first?.text ?? ""
+    }
+
+    func buildSleepContext(sessions: [SleepSession], logs: [DailyLog]) -> String {
+        let recent = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(14))
+        let avgScore = recent.compactMap { $0.score?.overallScore }.reduce(0, +) / max(1, recent.count)
+        let avgDur = recent.map(\.durationHours).reduce(0, +) / Double(max(1, recent.count))
+        let avgDeep = recent.map(\.deepSleepPercent).reduce(0, +) / Double(max(1, recent.count)) * 100
+        let avgREM = recent.map(\.remSleepPercent).reduce(0, +) / Double(max(1, recent.count)) * 100
+        return "Last 14 nights: avg score \(avgScore)/100, avg duration \(String(format: "%.1f", avgDur))h, deep sleep \(String(format: "%.0f", avgDeep))%, REM \(String(format: "%.0f", avgREM))%."
     }
 
     private var systemPrompt: String {

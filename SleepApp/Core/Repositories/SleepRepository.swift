@@ -75,4 +75,15 @@ final class SleepRepository {
         sessions.forEach { context.delete($0) }
         try context.save()
     }
+
+    @discardableResult
+    func deleteOlderThan(days: Int) throws -> Int {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        let predicate = #Predicate<SleepSession> { $0.endDate < cutoff }
+        let descriptor = FetchDescriptor<SleepSession>(predicate: predicate)
+        let old = try context.fetch(descriptor)
+        old.forEach { context.delete($0) }
+        if !old.isEmpty { try context.save() }
+        return old.count
+    }
 }

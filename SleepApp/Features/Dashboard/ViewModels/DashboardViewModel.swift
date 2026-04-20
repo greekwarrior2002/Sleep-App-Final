@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import Combine
+import WidgetKit
 
 @MainActor
 final class DashboardViewModel: ObservableObject {
@@ -14,6 +15,9 @@ final class DashboardViewModel: ObservableObject {
     @Published var hasCheckedInToday = false
     @Published var todayLog: DailyLog?
     @Published var sleepGoalHours: Double = Constants.Sleep.defaultGoalHours
+    @Published var weeklyDebt: SleepDebtResult?
+    @Published var bedtimeWindows: [BedtimeWindow] = []
+    @Published var wakeTimeString: String = ""
 
     private var sleepRepo: SleepRepository?
     private var scoreRepo: SleepScoreRepository?
@@ -21,6 +25,8 @@ final class DashboardViewModel: ObservableObject {
     private var logRepo: DailyLogRepository?
     private let healthKit = HealthKitService.shared
     private let scoreEngine = SleepScoreEngine()
+    private let debtCalculator = SleepDebtCalculator()
+    private let bedtimeOptimizer = BedtimeOptimizer()
 
     func setup(context: ModelContext) {
         guard sleepRepo == nil else { return }
@@ -41,6 +47,17 @@ final class DashboardViewModel: ObservableObject {
             currentInsight = try insightRepo.currentInsight()
             todayLog = try logRepo.fetchForDate(Date())
             hasCheckedInToday = todayLog?.moodAfterWaking ?? 0 > 0
+            weeklyDebt = debtCalculator.calculate(sessions: recentSessions, goalHours: sleepGoalHours)
+            updateWidget()
+            let wakeHour = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeHourKey)
+            let wakeMinute = UserDefaults.standard.integer(forKey: Constants.UserDefaults.wakeMinuteKey)
+            let h = wakeHour == 0 ? 6 : wakeHour
+            let m = wakeMinute
+            let fmt = DateFormatter(); fmt.dateFormat = "h:mm a"
+            var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+            comps.hour = h; comps.minute = m
+            wakeTimeString = fmt.string(from: Calendar.current.date(from: comps) ?? Date())
+            bedtimeWindows = bedtimeOptimizer.recommendedBedtimes(wakeHour: h, wakeMinute: m, sessions: recentSessions)
         } catch {
             self.error = error.localizedDescription
         }
@@ -106,5 +123,17 @@ final class DashboardViewModel: ObservableObject {
 
     var last7Sessions: [SleepSession] {
         Array(recentSessions.prefix(7).reversed())
+    }
+
+    private func updateWidget() {
+        guard let session = lastNightSession,
+              let score = lastNightScore else { return }
+        let defaults = UserDefaults(suiteName: "group.com.slumber.app")
+        defaults?.set(score.overallScore, forKey: "widget.lastScore")
+        defaults?.set(session.formattedDuration, forKey: "widget.lastDuration")
+        defaults?.set(score.grade, forKey: "widget.lastGrade")
+        defaults?.set(score.trend?.rawValue ?? "stable", forKey: "widget.lastTrend")
+        defaults?.set(session.endDate.relativeDescription, forKey: "widget.lastDate")
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }

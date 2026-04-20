@@ -35,7 +35,7 @@ struct InsightsView: View {
                     if let insight = viewModel.currentInsight, !insight.recommendations.isEmpty {
                         recommendationsSection(insight.recommendations)
                     }
-                    if viewModel.pastInsights.count > 1 { historySection }
+                    if !viewModel.visibleInsights.isEmpty { historySection }
                     Spacer(minLength: 100)
                 }
                 .padding(Spacing.md)
@@ -180,8 +180,22 @@ struct InsightsView: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             SectionHeaderView(title: "Past Reports").padding(.horizontal, Spacing.xxs)
             VStack(spacing: Spacing.xs) {
-                ForEach(viewModel.pastInsights.dropFirst()) { insight in
+                ForEach(viewModel.visibleInsights) { insight in
                     InsightHistoryRow(insight: insight)
+                }
+                if viewModel.hasMoreInsights {
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            viewModel.loadMoreInsights()
+                        }
+                    } label: {
+                        Text("Load More")
+                            .font(.labelLarge)
+                            .foregroundStyle(.sleepPurpleLight)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.sm)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -235,9 +249,9 @@ struct InsightsView: View {
                     Text("Refresh")
                 }
                 .font(.labelLarge)
-                .foregroundStyle(.sleepPurpleLight)
+                .foregroundStyle(viewModel.canRefresh ? .sleepPurpleLight : Color.textTertiary)
             }
-            .disabled(viewModel.isGenerating || !viewModel.hasAPIKey)
+            .disabled(!viewModel.canRefresh)
         }
     }
 }

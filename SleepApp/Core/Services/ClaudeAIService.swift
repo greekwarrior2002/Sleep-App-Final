@@ -59,6 +59,11 @@ final class ClaudeAIService: ObservableObject {
         }
 
         var messages = history.map { ClaudeMessage(role: $0.role, content: $0.content) }
+        // Claude API requires the first message to have role "user".
+        // Defensive strip in case the caller passes history with a leading assistant message.
+        while messages.first?.role == "assistant" {
+            messages.removeFirst()
+        }
         messages.append(ClaudeMessage(role: "user", content: userMessage))
 
         let chatSystem = """
@@ -90,7 +95,8 @@ final class ClaudeAIService: ObservableObject {
         }
         guard httpResponse.statusCode == 200 else {
             if httpResponse.statusCode == 401 { throw AIError.invalidAPIKey }
-            throw AIError.apiError(httpResponse.statusCode, "")
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw AIError.apiError(httpResponse.statusCode, body)
         }
 
         let decoded = try JSONDecoder().decode(ClaudeResponse.self, from: data)

@@ -51,18 +51,22 @@ final class SleepChatViewModel: ObservableObject {
         guard !text.isEmpty, !isTyping else { return }
         inputText = ""
 
-        let userMsg = ChatMessage(role: "user", content: text)
-        messages.append(userMsg)
+        messages.append(ChatMessage(role: "user", content: text))
 
         isTyping = true
         error = nil
         defer { isTyping = false }
 
-        let history = messages.dropLast().map { (role: $0.role, content: $0.content) }
+        // Build history without the just-added user message.
+        // Strip any leading assistant messages — Claude API requires the first
+        // message to have role "user" (the welcome message is from "assistant").
+        let prior = Array(messages.dropLast())
+        let firstUserIdx = prior.firstIndex(where: { $0.isUser }) ?? prior.endIndex
+        let history = Array(prior[firstUserIdx...]).map { (role: $0.role, content: $0.content) }
 
         do {
             let reply = try await aiService.sendChatMessage(
-                history: Array(history),
+                history: history,
                 userMessage: text,
                 sleepContext: sleepContext
             )

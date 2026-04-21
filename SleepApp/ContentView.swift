@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab: AppTab = .dashboard
     @State private var showLogSheet = false
+    @StateObject private var chatViewModel = SleepChatViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -14,8 +15,6 @@ struct ContentView: View {
                     .tag(AppTab.history)
                 InsightsView()
                     .tag(AppTab.insights)
-                SleepChatView()
-                    .tag(AppTab.chat)
                 SettingsView()
                     .tag(AppTab.settings)
             }
@@ -28,18 +27,18 @@ struct ContentView: View {
             DailyLogSheetView()
         }
         .background(Color.sleepBackground.ignoresSafeArea())
+        .environmentObject(chatViewModel)
     }
 }
 
 enum AppTab: Int, CaseIterable {
-    case dashboard, history, insights, chat, settings
+    case dashboard, history, insights, settings
 
     var icon: String {
         switch self {
         case .dashboard: return "moon.stars.fill"
         case .history: return "chart.bar.fill"
         case .insights: return "sparkles"
-        case .chat: return "bubble.left.and.bubble.right.fill"
         case .settings: return "gearshape.fill"
         }
     }
@@ -49,7 +48,6 @@ enum AppTab: Int, CaseIterable {
         case .dashboard: return "Sleep"
         case .history: return "History"
         case .insights: return "Insights"
-        case .chat: return "Coach"
         case .settings: return "Settings"
         }
     }
@@ -61,16 +59,13 @@ struct SleepTabBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(AppTab.allCases, id: \.rawValue) { tab in
-                if tab == .insights {
-                    tabButton(tab)
-                    Spacer()
-                    logButton
-                    Spacer()
-                } else {
-                    tabButton(tab)
-                }
-            }
+            tabButton(.dashboard)
+            tabButton(.history)
+            Spacer()
+            logButton
+            Spacer()
+            tabButton(.insights)
+            tabButton(.settings)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.top, Spacing.sm)
@@ -83,6 +78,7 @@ struct SleepTabBar: View {
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
+        .sensoryFeedback(.selection, trigger: selectedTab)
     }
 
     private func tabButton(_ tab: AppTab) -> some View {
@@ -92,19 +88,26 @@ struct SleepTabBar: View {
             VStack(spacing: 4) {
                 Image(systemName: tab.icon)
                     .font(.system(size: 22, weight: .medium))
+                    .scaleEffect(selectedTab == tab ? 1.15 : 1.0)
                 Text(tab.label)
                     .font(.labelSmall)
+                    .fontWeight(selectedTab == tab ? .semibold : .regular)
             }
             .foregroundStyle(selectedTab == tab ? Color.sleepPurpleLight : Color.textTertiary)
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedTab)
+        .accessibilityLabel(tab.label)
     }
 
     private var logButton: some View {
         Button { showLogSheet = true } label: {
             ZStack {
+                Circle()
+                    .fill(Color.sleepPurple.opacity(0.18))
+                    .frame(width: 72, height: 72)
                 Circle()
                     .fill(
                         LinearGradient(
@@ -113,14 +116,15 @@ struct SleepTabBar: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 52, height: 52)
-                    .shadow(color: Color.sleepPurple.opacity(0.4), radius: 12, y: 4)
+                    .frame(width: 60, height: 60)
+                    .shadow(color: Color.sleepPurple.opacity(0.55), radius: 18, y: 6)
                 Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.white)
             }
         }
         .buttonStyle(.plain)
-        .offset(y: -10)
+        .offset(y: -16)
+        .accessibilityLabel("Log today's sleep factors")
     }
 }

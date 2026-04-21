@@ -3,7 +3,9 @@ import SwiftData
 
 struct InsightsView: View {
     @Environment(\.modelContext) private var context
+    @EnvironmentObject private var chatViewModel: SleepChatViewModel
     @StateObject private var viewModel = InsightsViewModel()
+    @State private var showCoach = false
 
     var body: some View {
         NavigationStack {
@@ -14,6 +16,10 @@ struct InsightsView: View {
             .navigationTitle("Insights")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
+            .sheet(isPresented: $showCoach) {
+                SleepChatView()
+                    .environmentObject(chatViewModel)
+            }
         }
         .task {
             viewModel.setup(context: context)
@@ -30,6 +36,7 @@ struct InsightsView: View {
                 VStack(spacing: Spacing.lg) {
                     if !viewModel.hasAPIKey { apiKeyBanner }
                     if let error = viewModel.error { errorBanner(error) }
+                    coachEntryCard
                     reportCard
                     if !combinedCorrelations.isEmpty { correlationSection }
                     if let insight = viewModel.currentInsight, !insight.recommendations.isEmpty {
@@ -199,6 +206,49 @@ struct InsightsView: View {
                 }
             }
         }
+    }
+
+    private var coachEntryCard: some View {
+        Button { showCoach = true } label: {
+            GlassCard {
+                HStack(spacing: Spacing.md) {
+                    ZStack {
+                        Circle()
+                            .fill(LinearGradient(
+                                colors: [Color.sleepPurple.opacity(0.25), Color.sleepTeal.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: "bubble.left.and.bubble.right.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.sleepPurpleLight)
+                    }
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Sleep Coach")
+                            .font(.titleSmall)
+                            .foregroundStyle(.textPrimary)
+                        Text("Ask about your patterns, get personalized advice")
+                            .font(.bodyMedium)
+                            .foregroundStyle(.textSecondary)
+                            .lineLimit(2)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.textTertiary)
+                }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: Radius.lg)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [Color.sleepPurple.opacity(0.5), Color.sleepTeal.opacity(0.35)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing),
+                        lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var apiKeyBanner: some View {
